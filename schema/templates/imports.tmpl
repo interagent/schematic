@@ -1,0 +1,11 @@
+{{if .}}
+  {{if len . | eq 1}}
+    import {{range .}}"{{.}}"{{end}}
+  {{else}}
+    import (
+      {{range .}}
+				"{{.}}"
+			{{end}}
+		)
+	{{end}}
+{{end}}

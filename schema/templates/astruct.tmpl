@@ -1,0 +1,5 @@
+{{$Root := .Root}} struct {
+  {{range $Name, $Definition := .Definition.Properties}}
+    {{initialCap $Name}} {{$Root.GoType $Definition}} {{jsonTag $Name $Definition}} {{asComment $Definition.Description}}
+  {{end}}
+}
