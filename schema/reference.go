@@ -91,13 +91,15 @@ func (h *HRef) MarshalJSON() ([]byte, error) {
 	return []byte(h.href), nil
 }
 
-func (h *HRef) Resolve(s *Schema) (schemas []*Schema) {
+func (h *HRef) Resolve(s *Schema) map[string]*Schema {
+	schemas := make(map[string]*Schema)
 	for _, v := range href.FindAllString(h.href, -1) {
 		u, err := url.QueryUnescape(v[2 : len(v)-2])
 		if err != nil {
 			panic(err)
 		}
-		schemas = append(schemas, NewReference(u).Resolve(s))
+		parts := strings.Split(u, "/")
+		schemas[parts[len(parts)-1]] = NewReference(u).Resolve(s)
 	}
 	return schemas
 }

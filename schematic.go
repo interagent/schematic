@@ -11,7 +11,6 @@ import (
 
 var file = flag.String("file", "", "schema file")
 
-
 func main() {
 	log.SetFlags(0)
 	flag.Parse()

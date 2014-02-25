@@ -61,7 +61,7 @@ type Schema struct {
 type Link struct {
 	Title       string  `json:"title,omitempty"`
 	Description string  `json:"description,omitempty"`
-	HRef        *HRef  `json:"href,omitempty"`
+	HRef        *HRef   `json:"href,omitempty"`
 	Rel         string  `json:"rel,omitempty"`
 	Method      string  `json:"method,omitempty"`
 	Schema      *Schema `json:"schema,omitempty"`

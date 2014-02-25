@@ -70,7 +70,13 @@ func (s *Schema) Generate() ([]byte, error) {
 
 func (s *Schema) Resolve(p *Schema) *Schema {
 	if p.Ref != nil {
-		return p.Ref.Resolve(s)
+		p = p.Ref.Resolve(s)
+	}
+	if len(p.OneOf) > 0 {
+		p = p.OneOf[0].Ref.Resolve(s)
+	}
+	if len(p.AnyOf) > 0 {
+		p = p.AnyOf[0].Ref.Resolve(s)
 	}
 	return p
 }
@@ -127,8 +133,8 @@ func (s *Schema) GoType(p *Schema) string {
 
 func (s *Schema) Parameters(l *Link) map[string]string {
 	params := make(map[string]string)
-	for i, def := range l.HRef.Resolve(s) {
-		params[fmt.Sprintf("a%d", i)] = s.GoType(def)
+	for name, def := range l.HRef.Resolve(s) {
+		params[name] = s.GoType(def)
 	}
 	return params
 }
