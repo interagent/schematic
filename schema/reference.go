@@ -82,6 +82,10 @@ type HRef struct {
 	href string
 }
 
+func NewHRef(href string) *HRef {
+	return &HRef{href}
+}
+
 func (h *HRef) UnmarshalJSON(data []byte) error {
 	h.href = string(data[1 : len(data)-1])
 	return nil
