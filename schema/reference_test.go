@@ -47,7 +47,7 @@ func TestReferenceResolve(t *testing.T) {
 		ref := NewReference(rt.Ref)
 		rsl := ref.Resolve(rt.Schema)
 		if !reflect.DeepEqual(rsl, rt.Resolved) {
-			t.Errorf("%i: resolved schema don't match, got %v, wants %v", i, rsl, rt.Resolved)
+			t.Errorf("%d: resolved schema don't match, got %v, wants %v", i, rsl, rt.Resolved)
 		}
 	}
 }
@@ -83,7 +83,7 @@ func TestHREfResolve(t *testing.T) {
 		href := NewHRef(ht.HRef)
 		rsl := href.Resolve(ht.Schema)
 		if !reflect.DeepEqual(rsl, ht.Resolved) {
-			t.Errorf("%i: resolved schemas don't match, got %v, wants %v", i, rsl, ht.Resolved)
+			t.Errorf("%d: resolved schemas don't match, got %v, wants %v", i, rsl, ht.Resolved)
 		}
 	}
 }
