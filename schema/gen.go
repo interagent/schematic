@@ -3,6 +3,7 @@ package schema
 import (
 	"bytes"
 	"fmt"
+	bundle "github.com/heroku/schematic/schema/templates"
 	"go/format"
 	"regexp"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"unicode/utf8"
 )
 
-var templates = template.Must(template.New("package.tmpl").Funcs(helpers).ParseGlob("schema/templates/*.tmpl"))
+var templates = template.New("package.tmpl").Funcs(helpers)
 
 var helpers = template.FuncMap{
 	"initialCap":     initialCap,
@@ -27,6 +28,10 @@ var (
 	newlines = regexp.MustCompile(`(?m:\s*$)`)
 	acronyms = regexp.MustCompile(`(?m)(Url|Http|Id|Uuid|Api|Uri|Ssl|Cname|Oauth)`)
 )
+
+func init() {
+	bundle.Parse(templates)
+}
 
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
