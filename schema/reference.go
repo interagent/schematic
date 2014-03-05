@@ -19,10 +19,12 @@ type Reference struct {
 	ref string
 }
 
+// Create a new Reference.
 func NewReference(ref string) *Reference {
 	return &Reference{ref}
 }
 
+// Resolve reference.
 func (r *Reference) Resolve(s *Schema) *Schema {
 	if !strings.HasPrefix(r.ref, fragment) {
 		panic("non-fragment reference are not supported")

@@ -13,7 +13,7 @@ var templates = map[string]string{"astruct.tmpl": `{{$Root := .Root}} struct {
   {{asComment .Description}}
   func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{$Root.Parameters . | params}}) (error) {
     {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-    return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}"))
+    return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
   }
 {{end}}`,
 	"imports.tmpl": `{{if .}}
@@ -52,3 +52,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+

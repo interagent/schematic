@@ -4,6 +4,6 @@
   {{asComment .Description}}
   func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{$Root.Parameters . | params}}) (error) {
     {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-    return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}"))
+    return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
   }
 {{end}}

@@ -22,6 +22,7 @@ var helpers = template.FuncMap{
 	"asComment":      asComment,
 	"jsonTag":        jsonTag,
 	"params":         params,
+	"args":           args,
 }
 
 var (
@@ -30,9 +31,12 @@ var (
 )
 
 func init() {
+	templates, _ = templates.ParseGlob("schema/templates/*.tmpl")
 	bundle.Parse(templates)
 }
 
+
+// Generate code according to the schema.
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
@@ -73,6 +77,7 @@ func (s *Schema) Generate() ([]byte, error) {
 	return clean, nil
 }
 
+// Resolve reference inside the schema.
 func (s *Schema) Resolve(p *Schema) *Schema {
 	if p.Ref != nil {
 		p = p.Ref.Resolve(s)
@@ -86,6 +91,7 @@ func (s *Schema) Resolve(p *Schema) *Schema {
 	return p
 }
 
+// Return Go type for the given schema as string.
 func (s *Schema) GoType(p *Schema) string {
 	prop := s.Resolve(p)
 
@@ -136,6 +142,7 @@ func (s *Schema) GoType(p *Schema) string {
 	panic("type not found")
 }
 
+// Return function parameters names and types.
 func (s *Schema) Parameters(l *Link) map[string]string {
 	params := make(map[string]string)
 	for name, def := range l.HRef.Resolve(s) {
@@ -236,4 +243,12 @@ func params(m map[string]string) string {
 		p = append(p, fmt.Sprintf("%s %s", k, v))
 	}
 	return strings.Join(p, ",")
+}
+
+func args(m map[string]*Schema) string {
+	var p []string
+	for k, _ := range m {
+		p = append(p, k)
+	}
+	return strings.Join(p, ", ")
 }
