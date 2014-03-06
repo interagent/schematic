@@ -11,9 +11,17 @@ var templates = map[string]string{"astruct.tmpl": `{{$Root := .Root}} struct {
 {{$Root := .Root}}
 {{range .Definition.Links}}
   {{asComment .Description}}
-  func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{$Root.Parameters . | params}}) (error) {
-    {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-    return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+  func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{$Root.Parameters . | params}}) ({{$Root.Values $Name . | join}}) {
+    {{if eq .Rel "destroy"}}
+      return c.Delete(fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+    {{else if eq .Rel "instances"}}
+      {{$Var := printf "%s-%s" $Name "List" | initialLow}}
+      var {{$Var}} []*{{initialCap $Name}}
+      return {{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+    {{else}}
+      {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
+      return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+    {{end}}
   }
 {{end}}`,
 	"imports.tmpl": `{{if .}}
