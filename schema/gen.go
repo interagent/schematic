@@ -23,6 +23,7 @@ var helpers = template.FuncMap{
 	"jsonTag":        jsonTag,
 	"params":         params,
 	"args":           args,
+	"join":           join,
 }
 
 var (
@@ -34,7 +35,6 @@ func init() {
 	templates, _ = templates.ParseGlob("schema/templates/*.tmpl")
 	bundle.Parse(templates)
 }
-
 
 // Generate code according to the schema.
 func (s *Schema) Generate() ([]byte, error) {
@@ -151,6 +151,20 @@ func (s *Schema) Parameters(l *Link) map[string]string {
 	return params
 }
 
+func (s *Schema) Values(name string, l *Link) []string {
+	var values []string
+	name = initialCap(name)
+	switch l.Rel {
+	case "destroy":
+		values = append(values, "error")
+	case "instances":
+		values = append(values, fmt.Sprintf("[]*%s", name), "error")
+	default:
+		values = append(values, fmt.Sprintf("*%s", name), "error")
+	}
+	return values
+}
+
 func jsonTag(n string, def *Schema) string {
 	tags := []string{n}
 	if !contains(n, def.Required) {
@@ -235,6 +249,10 @@ func asComment(c string) string {
 		}
 	}
 	return buf.String()
+}
+
+func join(p []string) string {
+	return strings.Join(p, ",")
 }
 
 func params(m map[string]string) string {
