@@ -6,6 +6,7 @@ import (
 	bundle "github.com/heroku/schematic/schema/templates"
 	"go/format"
 	"regexp"
+	"strings"
 	"text/template"
 )
 
@@ -25,8 +26,8 @@ func init() {
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
-	// TODO: Allow to change name of package.
-	templates.ExecuteTemplate(&buf, "package.tmpl", "schema")
+	name := strings.ToLower(strings.Split(s.Title, " ")[0])
+	templates.ExecuteTemplate(&buf, "package.tmpl", name)
 
 	// TODO: Check if we need time.
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{"time", "fmt"})
