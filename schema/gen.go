@@ -126,7 +126,7 @@ func (s *Schema) GoType(p *Schema) string {
 		case "null":
 			continue
 		default:
-			panic(fmt.Sprintf("unknow type %s", kind))
+			panic(fmt.Sprintf("unknown type %s", kind))
 		}
 	}
 	panic("type not found")
