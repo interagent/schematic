@@ -139,7 +139,7 @@ func (s *Schema) Parameters(l *Link) map[string]string {
 	}
 	switch l.Rel {
 	case "update", "create":
-		params["options"] = l.GoType(s)
+		params["o"] = l.GoType(s)
 	case "instances":
 		params["r"] = "*ListRange"
 	}
