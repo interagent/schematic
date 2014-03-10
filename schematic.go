@@ -28,7 +28,7 @@ func main() {
 
 	code, err := s.Generate()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	fmt.Println(string(code))
 }
