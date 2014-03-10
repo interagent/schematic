@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var file = flag.String("file", "", "schema file")
+var file = flag.String("schema", "", "JSON Schema file")
 
 func main() {
 	log.SetFlags(0)
