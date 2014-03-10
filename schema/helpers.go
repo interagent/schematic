@@ -121,7 +121,7 @@ func params(m map[string]string) string {
 
 func args(m map[string]*Schema) string {
 	var p []string
-	for k, _ := range m {
+	for k := range m {
 		p = append(p, k)
 	}
 	return strings.Join(p, ", ")

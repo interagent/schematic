@@ -10,7 +10,7 @@ import (
 	"text/template"
 )
 
-var templates = template.New("package.tmpl").Funcs(helpers)
+var templates *template.Template
 
 var (
 	newlines = regexp.MustCompile(`(?m:\s*$)`)
@@ -18,7 +18,8 @@ var (
 )
 
 func init() {
-	templates, _ = templates.ParseGlob("schema/templates/*.tmpl")
+	templates = template.New("package.tmpl").Funcs(helpers)
+	templates.ParseGlob("templates/*.tmpl")
 	bundle.Parse(templates)
 }
 
@@ -135,9 +136,14 @@ func (s *Schema) GoType(p *Schema) string {
 // Return function parameters names and types.
 func (s *Schema) Parameters(l *Link) map[string]string {
 	params := make(map[string]string)
+	if l.HRef == nil {
+		// No HRef property
+		goto Rel
+	}
 	for name, def := range l.HRef.Resolve(s) {
 		params[name] = s.GoType(def)
 	}
+Rel:
 	switch l.Rel {
 	case "update", "create":
 		params["o"] = l.GoType(s)

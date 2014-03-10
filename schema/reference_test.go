@@ -14,7 +14,7 @@ var resolveTests = []struct {
 		Ref: "#/definitions/uuid",
 		Schema: &Schema{
 			Definitions: map[string]*Schema{
-				"uuid": &Schema{
+				"uuid": {
 					Title: "Identifier",
 				},
 			},
@@ -27,9 +27,9 @@ var resolveTests = []struct {
 		Ref: "#/definitions/struct/definitions/uuid",
 		Schema: &Schema{
 			Definitions: map[string]*Schema{
-				"struct": &Schema{
+				"struct": {
 					Definitions: map[string]*Schema{
-						"uuid": &Schema{
+						"uuid": {
 							Title: "Identifier",
 						},
 					},
@@ -61,9 +61,9 @@ var hrefTests = []struct {
 		HRef: "/edit/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}",
 		Schema: &Schema{
 			Definitions: map[string]*Schema{
-				"struct": &Schema{
+				"struct": {
 					Definitions: map[string]*Schema{
-						"uuid": &Schema{
+						"uuid": {
 							Title: "Identifier",
 						},
 					},
@@ -71,7 +71,7 @@ var hrefTests = []struct {
 			},
 		},
 		Resolved: map[string]*Schema{
-			"uuid": &Schema{
+			"uuid": {
 				Title: "Identifier",
 			},
 		},
@@ -85,5 +85,12 @@ func TestHREfResolve(t *testing.T) {
 		if !reflect.DeepEqual(rsl, ht.Resolved) {
 			t.Errorf("%d: resolved schemas don't match, got %v, wants %v", i, rsl, ht.Resolved)
 		}
+	}
+}
+
+func TestHRefString(t *testing.T) {
+	href := NewHRef("/edit/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}")
+	if href.String() != "/edit/%v" {
+		t.Errorf("wants %v, got %v", "/edit/%v", href.String())
 	}
 }
