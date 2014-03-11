@@ -170,5 +170,8 @@ func (s *Schema) Values(name string, l *Link) []string {
 
 func (l *Link) GoType(r *Schema) string {
 	// FIXME: Arguments are reverse from Schema.GoType()
+	if l.Schema.Type == nil {
+		l.Schema.Type = "object"
+	}
 	return r.GoType(l.Schema)
 }
