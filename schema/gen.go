@@ -130,7 +130,7 @@ func (s *Schema) GoType(p *Schema) string {
 			panic(fmt.Sprintf("unknown type %s", kind))
 		}
 	}
-	panic("type not found")
+	panic(fmt.Sprintf("type not found : %s", types))
 }
 
 // Return function parameters names and types.

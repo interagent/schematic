@@ -27,7 +27,7 @@ func NewReference(ref string) *Reference {
 // Resolve reference.
 func (r *Reference) Resolve(s *Schema) *Schema {
 	if !strings.HasPrefix(r.ref, fragment) {
-		panic("non-fragment reference are not supported")
+		panic(fmt.Sprintf("non-fragment reference are not supported : %s", r.ref))
 	}
 	var node interface{}
 	node = s
@@ -63,7 +63,7 @@ func (r *Reference) Resolve(s *Schema) *Schema {
 			}
 			node = kv.Interface()
 		default:
-			panic("can't follow pointer")
+			panic(fmt.Sprintf("can't follow pointer : %s", r.ref))
 		}
 	}
 	return node.(*Schema)
