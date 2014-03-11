@@ -4,26 +4,26 @@ import "text/template"
 
 var templates = map[string]string{"astruct.tmpl": `{{$Root := .Root}} struct {
   {{range $Name, $Definition := .Definition.Properties}}
-    {{initialCap $Name}} {{$Root.GoType $Definition}} {{jsonTag $Name $Definition}} {{asComment $Definition.Description}}
+    {{initialCap $Name}} {{goType $Root $Definition}} {{jsonTag $Name $Definition}} {{asComment $Definition.Description}}
   {{end}}
 }`,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Root := .Root}}
 {{range .Definition.Links}}
   {{asComment .Description}}
-  func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{$Root.Parameters . | params}}) ({{$Root.Values $Name . | join}}) {
+  func (c *Client) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name .}}) {
     {{if eq .Rel "destroy"}}
-      return c.Delete(fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+      return c.Delete(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
     {{else if eq .Rel "self"}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, c.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+      return &{{$Var}}, c.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
     {{else if eq .Rel "instances"}}
       {{$Var := printf "%s-%s" $Name "List" | initialLow}}
       var {{$Var}} []*{{initialCap $Name}}
-      return {{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}))
+      return {{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{.HRef.Resolve $Root | args}}), o)
+      return &{{$Var}}, c.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), o)
     {{end}}
   }
 {{end}}

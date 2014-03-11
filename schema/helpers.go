@@ -10,15 +10,19 @@ import (
 )
 
 var helpers = template.FuncMap{
-	"initialCap":     initialCap,
-	"initialLow":     initialLow,
-	"methodCap":      methodCap,
-	"validIdentifer": validIdentifer,
-	"asComment":      asComment,
-	"jsonTag":        jsonTag,
-	"params":         params,
-	"args":           args,
-	"join":           join,
+	"initialCap": initialCap,
+	"initialLow": initialLow,
+	"methodCap":  methodCap,
+	"asComment":  asComment,
+	"jsonTag":    jsonTag,
+	"params":     params,
+	"args":       args,
+	"values":     values,
+	"goType":     goType,
+}
+
+func goType(r *Schema, p *Schema) string {
+	return r.GoType(p)
 }
 
 func jsonTag(n string, def *Schema) string {
@@ -53,10 +57,6 @@ func initialLow(ident string) string {
 	capitalize := initialCap(ident)
 	r, n := utf8.DecodeRuneInString(capitalize)
 	return string(unicode.ToLower(r)) + capitalize[n:]
-}
-
-func validIdentifer(ident string) string {
-	return depunct(ident, false)
 }
 
 func depunct(ident string, needCap bool) string {
@@ -107,21 +107,22 @@ func asComment(c string) string {
 	return buf.String()
 }
 
-func join(p []string) string {
-	return strings.Join(p, ",")
+func values(s *Schema, n string, l *Link) string {
+	v := s.Values(n, l)
+	return strings.Join(v, ", ")
 }
 
-func params(m map[string]string) string {
+func params(s *Schema, l *Link) string {
 	var p []string
-	for k, v := range m {
+	for k, v := range s.Parameters(l) {
 		p = append(p, fmt.Sprintf("%s %s", k, v))
 	}
-	return strings.Join(p, ",")
+	return strings.Join(p, ", ")
 }
 
-func args(m map[string]*Schema) string {
+func args(s *Schema, h *HRef) string {
 	var p []string
-	for k := range m {
+	for k := range h.Resolve(s) {
 		p = append(p, k)
 	}
 	return strings.Join(p, ", ")
