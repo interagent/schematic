@@ -36,10 +36,22 @@ func (r *Reference) Resolve(s *Schema) *Schema {
 		v := reflect.Indirect(reflect.ValueOf(node))
 		switch v.Kind() {
 		case reflect.Struct:
-			// TODO: Read json tags.
-			f := v.FieldByNameFunc(func(n string) bool {
-				return strings.ToLower(n) == t
-			})
+			var f reflect.Value
+			for i := 0; i < v.NumField(); i++ {
+				f = v.Field(i)
+				ft := v.Type().Field(i)
+				tag := ft.Tag.Get("json")
+				if tag == "-" {
+					continue
+				}
+				name := parseTag(tag)
+				if name == "" {
+					name = ft.Name
+				}
+				if name == t {
+					break
+				}
+			}
 			if !f.IsValid() {
 				panic(fmt.Sprintf("can't find '%s' field in %s", t, r.ref))
 			}
@@ -78,6 +90,13 @@ func encode(t string) (encoded string) {
 func decode(t string) (decoded string) {
 	decoded = strings.Replace(t, "~1", "/", -1)
 	return strings.Replace(decoded, "~0", "~", -1)
+}
+
+func parseTag(tag string) string {
+	if i := strings.Index(tag, ","); i != -1 {
+		return tag[:i]
+	}
+	return tag
 }
 
 type HRef struct {
