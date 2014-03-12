@@ -109,7 +109,7 @@ var paramsTests = []struct {
 			Rel: "instances",
 		},
 		Parameters: map[string]string{
-			"r": "*ListRange",
+			"lr": "*ListRange",
 		},
 	},
 	{
@@ -127,16 +127,20 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{
 			Definitions: map[string]*Schema{
-				"uuid": {
-					Type: "string",
+				"struct": {
+					Definitions: map[string]*Schema{
+						"uuid": {
+							Type: "string",
+						},
+					},
 				},
 			},
 		},
 		Link: &Link{
-			HRef: NewHRef("/results/{(%23%2Fdefinitions%2Fuuid)}"),
+			HRef: NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
 		},
 		Parameters: map[string]string{
-			"uuid": "string",
+			"structUUID": "string",
 		},
 	},
 }
@@ -170,7 +174,7 @@ var valuesTests = []struct {
 		Link: &Link{
 			Rel: "instances",
 		},
-		Values: []string{"[]*Result", "error"},
+		Values: []string{"[]Result", "error"},
 	},
 	{
 		Schema: &Schema{},

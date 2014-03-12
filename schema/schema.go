@@ -5,6 +5,7 @@ type Schema struct {
 	Title       string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
 	URL         string `json:"url,omitempty"`
+	Version     string `json:"version,omitempty"`
 
 	Default  interface{} `json:"default,omitempty"`
 	ReadOnly bool        `json:"readOnly,omitempty"`

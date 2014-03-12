@@ -1,4 +1,2 @@
-{{if .Definition.Properties}}
-  {{asComment .Definition.Description}}
-  type {{initialCap .Name}} {{template "astruct.tmpl" .}}
-{{end}}
+{{asComment .Definition.Description}}
+type {{initialCap .Name}} {{goType .Root .Definition}}

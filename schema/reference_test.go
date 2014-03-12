@@ -58,10 +58,10 @@ var hrefTests = []struct {
 	Resolved map[string]*Schema
 }{
 	{
-		HRef: "/edit/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}",
+		HRef: "/app/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fuuid)}",
 		Schema: &Schema{
 			Definitions: map[string]*Schema{
-				"struct": {
+				"app": {
 					Definitions: map[string]*Schema{
 						"uuid": {
 							Title: "Identifier",
@@ -71,8 +71,37 @@ var hrefTests = []struct {
 			},
 		},
 		Resolved: map[string]*Schema{
-			"uuid": {
+			"appUUID": {
 				Title: "Identifier",
+			},
+		},
+	},
+	{
+		HRef: "/app/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}/struct/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fidentity)}",
+		Schema: &Schema{
+			Definitions: map[string]*Schema{
+				"app": {
+					Definitions: map[string]*Schema{
+						"identity": {
+							Title: "App Identifier",
+						},
+					},
+				},
+				"struct": {
+					Definitions: map[string]*Schema{
+						"identity": {
+							Title: "Struct Identifier",
+						},
+					},
+				},
+			},
+		},
+		Resolved: map[string]*Schema{
+			"appIdentity": {
+				Title: "App Identifier",
+			},
+			"structIdentity": {
+				Title: "Struct Identifier",
 			},
 		},
 	},
@@ -89,8 +118,8 @@ func TestHREfResolve(t *testing.T) {
 }
 
 func TestHRefString(t *testing.T) {
-	href := NewHRef("/edit/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}")
-	if href.String() != "/edit/%v" {
-		t.Errorf("wants %v, got %v", "/edit/%v", href.String())
+	href := NewHRef("/app/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}")
+	if href.String() != "/app/%v" {
+		t.Errorf("wants %v, got %v", "/app/%v", href.String())
 	}
 }

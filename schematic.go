@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/heroku/schematic/schema"
 	"log"
 	"os"
+
+	"github.com/heroku/schematic/schema"
 )
 
 var file = flag.String("schema", "", "JSON Schema file")

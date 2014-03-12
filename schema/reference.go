@@ -124,7 +124,8 @@ func (h *HRef) Resolve(s *Schema) map[string]*Schema {
 			panic(err)
 		}
 		parts := strings.Split(u, "/")
-		schemas[parts[len(parts)-1]] = NewReference(u).Resolve(s)
+		name := initialLow(fmt.Sprintf("%s-%s", parts[len(parts)-3], parts[len(parts)-1]))
+		schemas[name] = NewReference(u).Resolve(s)
 	}
 	return schemas
 }

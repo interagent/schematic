@@ -3,19 +3,14 @@ package schema
 import (
 	"bytes"
 	"fmt"
-	bundle "github.com/heroku/schematic/schema/templates"
 	"go/format"
-	"regexp"
 	"strings"
 	"text/template"
+
+	bundle "github.com/heroku/schematic/schema/templates"
 )
 
 var templates *template.Template
-
-var (
-	newlines = regexp.MustCompile(`(?m:\s*$)`)
-	acronyms = regexp.MustCompile(`(?m)(Url|Http|Id|Uuid|Api|Uri|Ssl|Cname|Oauth)`)
-)
 
 func init() {
 	templates = template.New("package.tmpl").Funcs(helpers)
@@ -31,7 +26,21 @@ func (s *Schema) Generate() ([]byte, error) {
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
 
 	// TODO: Check if we need time.
-	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{"time", "fmt"})
+	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
+		"encoding/json", "fmt", "io", "log",
+		"net/http", "net/http/httputil", "strings",
+		"runtime", "time", "bytes", "reflect",
+		"code.google.com/p/go-uuid/uuid",
+	})
+	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
+		Name    string
+		URL     string
+		Version string
+	}{
+		Name:    name,
+		URL:     s.URL,
+		Version: s.Version,
+	})
 
 	for name, def := range s.Definitions {
 		// Skipping definitions because there is no links, nor properties.
@@ -148,7 +157,7 @@ Rel:
 	case "update", "create":
 		params["o"] = l.GoType(s)
 	case "instances":
-		params["r"] = "*ListRange"
+		params["lr"] = "*ListRange"
 	}
 	return params
 }
@@ -158,16 +167,17 @@ func (s *Schema) Values(name string, l *Link) []string {
 	var values []string
 	name = initialCap(name)
 	switch l.Rel {
-	case "destroy":
+	case "destroy", "empty":
 		values = append(values, "error")
 	case "instances":
-		values = append(values, fmt.Sprintf("[]*%s", name), "error")
+		values = append(values, fmt.Sprintf("[]%s", name), "error")
 	default:
 		values = append(values, fmt.Sprintf("*%s", name), "error")
 	}
 	return values
 }
 
+// Return Go type for the given schema as string.
 func (l *Link) GoType(r *Schema) string {
 	// FIXME: Arguments are reverse from Schema.GoType()
 	if l.Schema.Type == nil {

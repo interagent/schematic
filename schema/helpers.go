@@ -3,6 +3,7 @@ package schema
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strings"
 	"text/template"
 	"unicode"
@@ -20,6 +21,12 @@ var helpers = template.FuncMap{
 	"values":     values,
 	"goType":     goType,
 }
+
+var (
+	newlines  = regexp.MustCompile(`(?m:\s*$)`)
+	acronyms  = regexp.MustCompile(`(Url|Http|Id|Uuid|Api|Uri|Ssl|Cname|Oauth)$`)
+	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}]`)
+)
 
 func goType(r *Schema, p *Schema) string {
 	return r.GoType(p)
@@ -54,31 +61,31 @@ func methodCap(ident string) string {
 }
 
 func initialLow(ident string) string {
-	capitalize := initialCap(ident)
-	r, n := utf8.DecodeRuneInString(capitalize)
-	return string(unicode.ToLower(r)) + capitalize[n:]
+	if ident == "" {
+		panic("blank identifier")
+	}
+	return depunct(ident, false)
 }
 
-func depunct(ident string, needCap bool) string {
-	var buf bytes.Buffer
-	for _, c := range ident {
-		if c == '-' || c == '.' || c == '$' || c == '/' || c == ':' || c == '_' || c == ' ' || c == '{' || c == '}' {
-			needCap = true
-			continue
+func depunct(ident string, initialCap bool) string {
+	matches := camelcase.Split(ident, -1)
+	for i, m := range matches {
+		if initialCap || i > 0 {
+			m = capFirst(m)
 		}
-		if needCap {
-			c = unicode.ToUpper(c)
-			needCap = false
-		}
-		buf.WriteByte(byte(c))
+		matches[i] = acronyms.ReplaceAllStringFunc(m, func(c string) string {
+			if len(c) > 4 {
+				return strings.ToUpper(c[:2]) + c[2:]
+			}
+			return strings.ToUpper(c)
+		})
 	}
-	depuncted := acronyms.ReplaceAllFunc(buf.Bytes(), func(m []byte) []byte {
-		if len(m) > 4 {
-			return append(bytes.ToUpper(m[:2]), m[2:]...)
-		}
-		return bytes.ToUpper(m)
-	})
-	return string(depuncted)
+	return strings.Join(matches, "")
+}
+
+func capFirst(ident string) string {
+	r, n := utf8.DecodeRuneInString(ident)
+	return string(unicode.ToUpper(r)) + ident[n:]
 }
 
 func asComment(c string) string {
@@ -115,7 +122,7 @@ func values(s *Schema, n string, l *Link) string {
 func params(s *Schema, l *Link) string {
 	var p []string
 	for k, v := range s.Parameters(l) {
-		p = append(p, fmt.Sprintf("%s %s", k, v))
+		p = append(p, fmt.Sprintf("%s %s", initialLow(k), v))
 	}
 	return strings.Join(p, ", ")
 }
