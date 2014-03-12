@@ -13,6 +13,12 @@ import (
 var file = flag.String("schema", "", "JSON Schema file")
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Fatal(r)
+		}
+	}()
+
 	log.SetFlags(0)
 	flag.Parse()
 

@@ -233,7 +233,7 @@ func (c *DefaultClient) Do(req *http.Request, v interface{}) error {
 func checkResponse(res *http.Response) error {
 	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
 		// FIXME: Try to handle error json in a generic way.
-		return fmt.Errorf("Encountered an error : %d", res.Status)
+		return fmt.Errorf("Encountered an error : %s", res.Status)
 	}
 	return nil
 }
