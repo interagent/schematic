@@ -25,7 +25,7 @@ var helpers = template.FuncMap{
 var (
 	newlines  = regexp.MustCompile(`(?m:\s*$)`)
 	acronyms  = regexp.MustCompile(`(Url|Http|Id|Uuid|Api|Uri|Ssl|Cname|Oauth)$`)
-	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}]`)
+	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}\s]`)
 )
 
 func goType(r *Schema, p *Schema) string {

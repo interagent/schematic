@@ -174,7 +174,7 @@ var valuesTests = []struct {
 		Link: &Link{
 			Rel: "instances",
 		},
-		Values: []string{"[]Result", "error"},
+		Values: []string{"[]*Result", "error"},
 	},
 	{
 		Schema: &Schema{},

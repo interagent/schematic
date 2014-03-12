@@ -170,7 +170,7 @@ func (s *Schema) Values(name string, l *Link) []string {
 	case "destroy", "empty":
 		values = append(values, "error")
 	case "instances":
-		values = append(values, fmt.Sprintf("[]%s", name), "error")
+		values = append(values, fmt.Sprintf("[]*%s", name), "error")
 	default:
 		values = append(values, fmt.Sprintf("*%s", name), "error")
 	}
