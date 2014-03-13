@@ -6,7 +6,7 @@ Generate Go client code for HTTP APIs described by [JSON Schemas](http://json-sc
 
 Download and install:
 
-```
+```console
 $ go get github.com/heroku/schematic
 ```
 
@@ -14,7 +14,7 @@ $ go get github.com/heroku/schematic
 
 Run it against your schema:
 
-```
+```console
 $ schematic api.json > heroku/heroku.go 
 ```
 
