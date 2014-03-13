@@ -1,58 +1,4 @@
-package templates
-
-import "text/template"
-
-var templates = map[string]string{"astruct.tmpl": `{{$Root := .Root}} struct {
-  {{range $Name, $Definition := .Definition.Properties}}
-    {{initialCap $Name}} {{goType $Root $Definition}} {{jsonTag $Name $Definition}} {{asComment $Definition.Description}}
-  {{end}}
-}`,
-	"funcs.tmpl": `{{$Name := .Name}}
-{{$Root := .Root}}
-{{range .Definition.Links}}
-  {{asComment .Description}}
-  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name .}}) {
-    {{if eq .Rel "destroy"}}
-      return s.Delete(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
-    {{else if eq .Rel "self"}}
-      {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
-    {{else if eq .Rel "instances"}}
-      req, err := s.NewRequest("GET", fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), nil)
-      if err != nil {
-        return nil, err
-      }
-
-      if lr != nil {
-        lr.SetHeader(req)
-      }
-      {{$Var := printf "%s-%s" $Name "List" | initialLow}}
-      var {{$Var}} []*{{initialCap $Name}}
-      return {{$Var}}, s.Client.Do(req, &{{$Var}})
-    {{else if eq .Rel "empty"}}
-      return s.{{methodCap .Method}}(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
-    {{else}}
-      {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), o)
-    {{end}}
-  }
-{{end}}
-
-`,
-	"imports.tmpl": `{{if .}}
-  {{if len . | eq 1}}
-    import {{range .}}"{{.}}"{{end}}
-  {{else}}
-    import (
-      {{range .}}
-				"{{.}}"
-			{{end}}
-		)
-	{{end}}
-{{end}}`,
-	"package.tmpl": `package {{.}}
-`,
-	"service.tmpl": `const (
+const (
 	Version          = "{{.Version}}"
 	DefaultAPIURL    = "{{.URL}}"
 	DefaultUserAgent = "{{.Name}}/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
@@ -296,27 +242,3 @@ func (lr *ListRange) SetHeader(req *http.Request) {
 	req.Header.Set("Range", hdrval)
 	return
 }
-`,
-	"struct.tmpl": `{{asComment .Definition.Description}}
-type {{initialCap .Name}} {{goType .Root .Definition}}
-`,
-}
-
-func Parse(t *template.Template) (*template.Template, error) {
-	for name, s := range templates {
-		var tmpl *template.Template
-		if t == nil {
-			t = template.New(name)
-		}
-		if name == t.Name() {
-			tmpl = t
-		} else {
-			tmpl = t.New(name)
-		}
-		if _, err := tmpl.Parse(s); err != nil {
-			return nil, err
-		}
-	}
-	return t, nil
-}
-
