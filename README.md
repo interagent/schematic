@@ -4,7 +4,7 @@ Generate Go client code for HTTP APIs described by [JSON Schemas](http://json-sc
 
 ## Installation
 
-Download and install :
+Download and install:
 
 ```
 $ go get github.com/heroku/schematic
@@ -12,7 +12,7 @@ $ go get github.com/heroku/schematic
 
 ## Usage
 
-Run it against your schema :
+Run it against your schema:
 
 ```
 $ schematic api.json > heroku/heroku.go 
@@ -24,7 +24,8 @@ package heroku
 ...
 ```
 
-You then would be able to use the package as follow :
+You then would be able to use the package as follow:
+
 ```go
 h := heroku.NewService(nil)
 addons, err := h.AddonList("schematic", nil)
