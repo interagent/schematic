@@ -30,7 +30,7 @@ if err != nil {
   ...
 }
 for _, addon := range addons {
-  fmt.Println(addons.Name)
+  fmt.Println(addon.Name)
 }
 ```
 
