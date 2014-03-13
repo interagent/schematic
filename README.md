@@ -21,7 +21,6 @@ This will generate a Go package named after your schema:
 package heroku
 ...
 ```
-You can explore 
 
 You then would be able to use the package as follow :
 ```go
