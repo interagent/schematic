@@ -8,6 +8,8 @@ Download and install :
 $ go get github.com/heroku/schematic
 ```
 
+**Warning**: schematic requires Go >= 1.2.
+
 ## Usage
 
 Run it against your schema :
