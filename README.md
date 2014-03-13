@@ -19,6 +19,7 @@ $ schematic api.json > heroku/heroku.go
 ```
 
 This will generate a Go package named after your schema:
+
 ```go
 package heroku
 ...
