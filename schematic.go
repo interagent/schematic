@@ -2,15 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/heroku/schematic/schema"
 )
-
-var file = flag.String("schema", "", "JSON Schema file")
 
 func main() {
 	defer func() {
@@ -20,9 +17,11 @@ func main() {
 	}()
 
 	log.SetFlags(0)
-	flag.Parse()
+	if len(os.Args) != 2 {
+		log.Fatal("schematic: missing schema file")
+	}
 
-	f, err := os.Open(*file)
+	f, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
