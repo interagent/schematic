@@ -1,5 +1,7 @@
 # Schematic
 
+Generate Go client code for HTTP APIs described by [JSON Schemas](http://json-schema.org/).
+
 ## Installation
 
 Download and install :
