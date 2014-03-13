@@ -14,8 +14,7 @@ var templates *template.Template
 
 func init() {
 	templates = template.New("package.tmpl").Funcs(helpers)
-	templates.ParseGlob("templates/*.tmpl")
-	bundle.Parse(templates)
+	templates = template.Must(bundle.Parse(templates))
 }
 
 // Generate code according to the schema.
