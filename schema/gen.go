@@ -41,9 +41,10 @@ func (s *Schema) Generate() ([]byte, error) {
 		Version: s.Version,
 	})
 
-	for name, def := range s.Definitions {
+	for name, schema := range s.Properties {
+		schema := s.Resolve(schema)
 		// Skipping definitions because there is no links, nor properties.
-		if def.Links == nil && def.Properties == nil {
+		if schema.Links == nil && schema.Properties == nil {
 			continue
 		}
 
@@ -53,7 +54,7 @@ func (s *Schema) Generate() ([]byte, error) {
 			Root       *Schema
 		}{
 			Name:       name,
-			Definition: def,
+			Definition: schema,
 			Root:       s,
 		}
 
