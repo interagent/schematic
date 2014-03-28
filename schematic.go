@@ -17,13 +17,19 @@ func main() {
 	}()
 
 	log.SetFlags(0)
+
 	if len(os.Args) != 2 {
 		log.Fatal("schematic: missing schema file")
 	}
 
-	f, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
+	var f *os.File
+	var err error
+	if os.Args[1] == "-" {
+		f = os.Stdin
+	} else {
+		if f, err = os.Open(os.Args[1]); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	var s schema.Schema

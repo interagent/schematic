@@ -146,7 +146,7 @@ func (s *Schema) GoType(p *Schema) string {
 		panic(fmt.Sprintf("type not found : %s", types))
 	}
 	if nullable {
-		return "*"+ goType
+		return "*" + goType
 	}
 	return goType
 }
