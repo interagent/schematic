@@ -100,29 +100,32 @@ func (s *Schema) GoType(p *Schema) string {
 		types = append(types, prop.Type.(string))
 	}
 
+	var goType string
+	var nullable bool
 	for _, kind := range types {
 		switch kind {
 		case "boolean":
-			return "bool"
+			goType = "bool"
 		case "string":
 			switch prop.Format {
 			case "date-time":
-				return "time.Time"
+				goType = "time.Time"
 			default:
-				return "string"
+				goType = "string"
 			}
 		case "number":
-			return "float64"
+			goType = "float64"
 		case "integer":
-			return "int64"
+			goType = "int64"
 		case "any":
-			return "interface{}"
+			goType = "interface{}"
 		case "array":
-			return "[]" + s.GoType(prop.Items)
+			goType = "[]" + s.GoType(prop.Items)
 		case "object":
 			// Check if additionalProperties is false.
 			if m, ok := prop.AdditionalProperties.(bool); ok && !m {
-				return "map[string]string"
+				goType = "map[string]string"
+				continue
 			}
 			var buf bytes.Buffer
 			templates.ExecuteTemplate(&buf, "astruct.tmpl", struct {
@@ -132,14 +135,20 @@ func (s *Schema) GoType(p *Schema) string {
 				Definition: prop,
 				Root:       s,
 			})
-			return buf.String()
+			goType = buf.String()
 		case "null":
-			continue
+			nullable = true
 		default:
 			panic(fmt.Sprintf("unknown type %s", kind))
 		}
 	}
-	panic(fmt.Sprintf("type not found : %s", types))
+	if goType == "" {
+		panic(fmt.Sprintf("type not found : %s", types))
+	}
+	if nullable {
+		return "*"+ goType
+	}
+	return goType
 }
 
 // Return function parameters names and types.

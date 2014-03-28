@@ -51,7 +51,7 @@ var typeTests = []struct {
 		Schema: &Schema{
 			Type: []interface{}{"null", "string"},
 		},
-		Type: "string",
+		Type: "*string",
 	},
 	{
 		Schema: &Schema{
@@ -79,6 +79,13 @@ var typeTests = []struct {
 			},
 		},
 		Type: "Counter int64",
+	},
+	{
+		Schema: &Schema{
+			Type:   []interface{}{"null", "string"},
+			Format: "date-time",
+		},
+		Type: "*time.Time",
 	},
 }
 
