@@ -39,9 +39,3 @@ for _, addon := range addons {
   fmt.Println(addon.Name)
 }
 ```
-
-You can also provide a custom client:
-
-```go
-h := heroku.NewService(&HerokuClient{})
-```
