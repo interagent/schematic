@@ -40,12 +40,6 @@ for _, addon := range addons {
 }
 ```
 
-You can also provide a custom client:
-
-```go
-h := heroku.NewService(&HerokuClient{})
-```
-
 ## Development
 
 Schematic bundles templated Go code into a Go source file via the

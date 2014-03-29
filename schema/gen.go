@@ -26,10 +26,8 @@ func (s *Schema) Generate() ([]byte, error) {
 
 	// TODO: Check if we need time.
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
-		"encoding/json", "fmt", "io", "log",
-		"net/http", "net/http/httputil", "strings",
-		"runtime", "time", "bytes", "reflect",
-		"code.google.com/p/go-uuid/uuid",
+		"encoding/json", "fmt", "io", "reflect",
+		"net/http", "runtime", "time", "bytes",
 	})
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
 		Name    string
