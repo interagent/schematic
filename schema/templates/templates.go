@@ -225,7 +225,10 @@ func (c *DefaultClient) Do(req *http.Request, v interface{}) error {
 		if err != nil {
 			log.Println(err)
 		} else {
-			log.Println(string(dump))
+			authHeader := regexp.MustCompilePOSIX("^Authorization: .*$")
+			authHeaderRedacted := []byte("Authorization: REDACTED")
+			dumpRedacted := authHeader.ReplaceAll(dump, authHeaderRedacted)
+			log.Println(string(dumpRedacted))
 		}
 	}
 
@@ -319,3 +322,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+
