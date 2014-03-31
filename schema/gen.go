@@ -28,7 +28,7 @@ func (s *Schema) Generate() ([]byte, error) {
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
 		"encoding/json", "fmt", "io", "log",
 		"net/http", "net/http/httputil", "strings",
-		"runtime", "time", "bytes", "reflect",
+		"runtime", "time", "bytes", "reflect", "regexp",
 		"code.google.com/p/go-uuid/uuid",
 	})
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
