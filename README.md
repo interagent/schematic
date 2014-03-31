@@ -45,3 +45,13 @@ You can also provide a custom client:
 ```go
 h := heroku.NewService(&HerokuClient{})
 ```
+
+## Development
+
+Schematic bundles templated Go code into a Go source file via the
+[templates package](https://github.com/cyberdelia/templates). To rebuild
+the Go source file after changing .tmpl files:
+
+```console
+$ templates -source schema/templates/ > schema/templates/templates.go
+```
