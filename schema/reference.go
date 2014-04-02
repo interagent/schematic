@@ -130,6 +130,10 @@ func (h *HRef) Resolve(s *Schema) map[string]*Schema {
 	return schemas
 }
 
+func (h *HRef) URL() (*url.URL, error) {
+	return url.Parse(h.href)
+}
+
 func (h *HRef) String() string {
 	return href.ReplaceAllStringFunc(h.href, func(v string) string {
 		return "%v"

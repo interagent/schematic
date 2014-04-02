@@ -4,7 +4,6 @@ type Schema struct {
 	ID          string `json:"id,omitempty"`
 	Title       string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
-	URL         string `json:"root_url,omitempty"`
 	Version     string `json:"version,omitempty"`
 
 	Default  interface{} `json:"default,omitempty"`

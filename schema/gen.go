@@ -35,7 +35,7 @@ func (s *Schema) Generate() ([]byte, error) {
 		Version string
 	}{
 		Name:    name,
-		URL:     s.URL,
+		URL:     s.URL(),
 		Version: s.Version,
 	})
 
@@ -184,9 +184,17 @@ func (s *Schema) Values(name string, l *Link) []string {
 	return values
 }
 
+func (s *Schema) URL() string {
+	for _, l := range s.Links {
+		if l.Rel == "self" {
+			return l.HRef.String()
+		}
+	}
+	return ""
+}
+
 // Return Go type for the given schema as string.
 func (l *Link) GoType(r *Schema) string {
-	// FIXME: Arguments are reverse from Schema.GoType()
 	if l.Schema.Type == nil {
 		l.Schema.Type = "object"
 	}
