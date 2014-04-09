@@ -77,6 +77,7 @@ var typeTests = []struct {
 					Type: "integer",
 				},
 			},
+			Required: []string{"counter"},
 		},
 		Type: "Counter int64",
 	},
@@ -89,11 +90,53 @@ var typeTests = []struct {
 	},
 }
 
-func TestGoType(t *testing.T) {
+func TestSchemaType(t *testing.T) {
 	for i, tt := range typeTests {
 		kind := tt.Schema.GoType(tt.Schema)
 		if !strings.Contains(kind, tt.Type) {
 			t.Errorf("%d: wants %v, got %v", i, tt.Type, kind)
+		}
+	}
+}
+
+var linkTests = []struct {
+	Link *Link
+	Type string
+}{
+	{
+		Link: &Link{
+			Schema: &Schema{
+				Properties: map[string]*Schema{
+					"string": {
+						Type: "string",
+					},
+				},
+				Type:     "object",
+				Required: []string{"string"},
+			},
+		},
+		Type: "String string",
+	},
+	{
+		Link: &Link{
+			Schema: &Schema{
+				Properties: map[string]*Schema{
+					"int": {
+						Type: "integer",
+					},
+				},
+				Type: "object",
+			},
+		},
+		Type: "Int *int",
+	},
+}
+
+func TestLinkType(t *testing.T) {
+	for i, lt := range linkTests {
+		kind := lt.Link.GoType(lt.Link.Schema)
+		if !strings.Contains(kind, lt.Type) {
+			t.Errorf("%d: wants %v, got %v", i, lt.Type, kind)
 		}
 	}
 }

@@ -32,9 +32,13 @@ func goType(r *Schema, p *Schema) string {
 	return r.GoType(p)
 }
 
-func jsonTag(n string, def *Schema) string {
+func required(n string, def *Schema) bool {
+	return contains(n, def.Required)
+}
+
+func jsonTag(n string, required bool) string {
 	tags := []string{n}
-	if !contains(n, def.Required) {
+	if !required {
 		tags = append(tags, "omitempty")
 	}
 	return fmt.Sprintf("`json:\"%s\"`", strings.Join(tags, ","))

@@ -2,11 +2,8 @@ package templates
 
 import "text/template"
 
-var templates = map[string]string{"astruct.tmpl": `{{$Root := .Root}} struct {
-  {{range $Name, $Definition := .Definition.Properties}}
-    {{initialCap $Name}} {{goType $Root $Definition}} {{jsonTag $Name $Definition}} {{asComment $Definition.Description}}
-  {{end}}
-}`,
+var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} {{jsonTag .Name .Required}} {{asComment .Definition.Description}}
+`,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Root := .Root}}
 {{range .Definition.Links}}
@@ -179,6 +176,34 @@ func (lr *ListRange) SetHeader(req *http.Request) {
 
 	req.Header.Set("Range", hdrval)
 	return
+}
+
+// Bool allocates a new int value returns a pointer to it.
+func Bool(v bool) *bool {
+	p := new(bool)
+	*p = v
+	return p
+}
+
+// Int64 allocates a new int64 value returns a pointer to it.
+func Int64(v int64) *int64 {
+	p := new(int64)
+	*p = v
+	return p
+}
+
+// Float64 allocates a new float64 value returns a pointer to it.
+func Float64(v float64) *float64 {
+	p := new(float64)
+	*p = v
+	return p
+}
+
+// String allocates a new string value returns a pointer to it.
+func String(v string) *string {
+	p := new(string)
+	*p = v
+	return p
 }
 `,
 	"struct.tmpl": `{{asComment .Definition.Description}}
