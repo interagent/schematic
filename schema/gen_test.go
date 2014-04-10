@@ -149,6 +149,7 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
+			HRef: NewHRef("/destroy/"),
 			Rel: "destroy",
 		},
 		Parameters: map[string]string{},
@@ -156,6 +157,7 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
+			HRef: NewHRef("/instances/"),
 			Rel: "instances",
 		},
 		Parameters: map[string]string{
@@ -166,6 +168,7 @@ var paramsTests = []struct {
 		Schema: &Schema{},
 		Link: &Link{
 			Rel: "update",
+			HRef: NewHRef("/update/"),
 			Schema: &Schema{
 				Type: "string",
 			},

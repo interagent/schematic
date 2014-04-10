@@ -7,6 +7,10 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Root := .Root}}
 {{range .Definition.Links}}
+  {{if eq .Rel "update" "create" }}
+   type {{printf "%s-%s-Opts" $Name .Title | initialCap}} {{.GoType $Root}}
+  {{end}}
+
   {{asComment .Description}}
   func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name .}}) {
     {{if eq .Rel "destroy"}}
@@ -228,3 +232,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+

@@ -165,19 +165,18 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 }
 
 // Return function parameters names and types.
-func (s *Schema) Parameters(l *Link) map[string]string {
+func (r *Schema) Parameters(l *Link) map[string]string {
 	params := make(map[string]string)
 	if l.HRef == nil {
 		// No HRef property
-		goto Rel
+		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
-	for name, def := range l.HRef.Resolve(s) {
-		params[name] = s.GoType(def)
+	for name, def := range l.HRef.Resolve(r) {
+		params[name] = r.GoType(def)
 	}
-Rel:
 	switch l.Rel {
 	case "update", "create":
-		params["o"] = l.GoType(s)
+		params["o"] = l.GoType(r)
 	case "instances":
 		params["lr"] = "*ListRange"
 	}
@@ -185,7 +184,7 @@ Rel:
 }
 
 // Return function return values types.
-func (s *Schema) Values(name string, l *Link) []string {
+func (r *Schema) Values(name string, l *Link) []string {
 	var values []string
 	name = initialCap(name)
 	switch l.Rel {
@@ -200,8 +199,8 @@ func (s *Schema) Values(name string, l *Link) []string {
 }
 
 // Return base URL
-func (s *Schema) URL() string {
-	for _, l := range s.Links {
+func (r *Schema) URL() string {
+	for _, l := range r.Links {
 		if l.Rel == "self" {
 			return l.HRef.String()
 		}
