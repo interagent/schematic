@@ -18,10 +18,10 @@ func init() {
 }
 
 // Generate code according to the schema.
-func (s *Schema) Generate() ([]byte, error) {
+func (r *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
-	name := strings.ToLower(strings.Split(s.Title, " ")[0])
+	name := strings.ToLower(strings.Split(r.Title, " ")[0])
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
 
 	// TODO: Check if we need time.
@@ -35,12 +35,12 @@ func (s *Schema) Generate() ([]byte, error) {
 		Version string
 	}{
 		Name:    name,
-		URL:     s.URL(),
-		Version: s.Version,
+		URL:     r.URL(),
+		Version: r.Version,
 	})
 
-	for name, schema := range s.Properties {
-		schema := s.Resolve(schema)
+	for name, schema := range r.Properties {
+		schema := r.Resolve(schema)
 		// Skipping definitions because there is no links, nor properties.
 		if schema.Links == nil && schema.Properties == nil {
 			continue
@@ -53,7 +53,7 @@ func (s *Schema) Generate() ([]byte, error) {
 		}{
 			Name:       name,
 			Definition: schema,
-			Root:       s,
+			Root:       r,
 		}
 
 		templates.ExecuteTemplate(&buf, "struct.tmpl", context)
@@ -72,40 +72,46 @@ func (s *Schema) Generate() ([]byte, error) {
 }
 
 // Resolve reference inside the schema.
-func (s *Schema) Resolve(p *Schema) *Schema {
-	if p.Ref != nil {
-		p = p.Ref.Resolve(s)
+func (r *Schema) Resolve(s *Schema) *Schema {
+	if s.Ref != nil {
+		s = s.Ref.Resolve(r)
 	}
-	if len(p.OneOf) > 0 {
-		p = p.OneOf[0].Ref.Resolve(s)
+	if len(s.OneOf) > 0 {
+		s = s.OneOf[0].Ref.Resolve(r)
 	}
-	if len(p.AnyOf) > 0 {
-		p = p.AnyOf[0].Ref.Resolve(s)
+	if len(s.AnyOf) > 0 {
+		s = s.AnyOf[0].Ref.Resolve(r)
 	}
-	return p
+	return s
 }
 
-// Return Go type for the given schema as string.
-func (s *Schema) GoType(p *Schema) string {
-	prop := s.Resolve(p)
-
-	var types []string
-	if arr, ok := prop.Type.([]interface{}); ok {
+func (r *Schema) Types() (types []string) {
+	if arr, ok := r.Type.([]interface{}); ok {
 		for _, v := range arr {
 			types = append(types, v.(string))
 		}
 	} else {
-		types = append(types, prop.Type.(string))
+		types = append(types, r.Type.(string))
 	}
+	return types
+}
 
-	var goType string
-	var nullable bool
+// Return Go type for the given schema as string.
+func (r *Schema) GoType(s *Schema) string {
+	return r.goType(s, true, true)
+}
+
+func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
+	// Resolve JSON reference/pointer
+	def := r.Resolve(s)
+
+	types := def.Types()
 	for _, kind := range types {
 		switch kind {
 		case "boolean":
 			goType = "bool"
 		case "string":
-			switch prop.Format {
+			switch def.Format {
 			case "date-time":
 				goType = "time.Time"
 			default:
@@ -118,24 +124,32 @@ func (s *Schema) GoType(p *Schema) string {
 		case "any":
 			goType = "interface{}"
 		case "array":
-			goType = "[]" + s.GoType(prop.Items)
+			goType = "[]" + r.goType(def.Items, required, force)
 		case "object":
 			// Check if additionalProperties is false.
-			if m, ok := prop.AdditionalProperties.(bool); ok && !m {
+			if m, ok := def.AdditionalProperties.(bool); ok && !m {
 				goType = "map[string]string"
 				continue
 			}
-			var buf bytes.Buffer
-			templates.ExecuteTemplate(&buf, "astruct.tmpl", struct {
-				Definition *Schema
-				Root       *Schema
-			}{
-				Definition: prop,
-				Root:       s,
-			})
+			buf := bytes.NewBufferString("struct {")
+			for name, prop := range def.Properties {
+				req := contains(name, def.Required) || force
+				templates.ExecuteTemplate(buf, "field.tmpl", struct {
+					Definition *Schema
+					Name       string
+					Required   bool
+					Type       string
+				}{
+					Definition: prop,
+					Name:       name,
+					Required:   req,
+					Type:       r.goType(prop, req, force),
+				})
+			}
+			buf.WriteString("}")
 			goType = buf.String()
 		case "null":
-			nullable = true
+			continue
 		default:
 			panic(fmt.Sprintf("unknown type %s", kind))
 		}
@@ -143,26 +157,26 @@ func (s *Schema) GoType(p *Schema) string {
 	if goType == "" {
 		panic(fmt.Sprintf("type not found : %s", types))
 	}
-	if nullable {
+	// Types allow null
+	if contains("null", types) || !(required || force) {
 		return "*" + goType
 	}
 	return goType
 }
 
 // Return function parameters names and types.
-func (s *Schema) Parameters(l *Link) map[string]string {
+func (r *Schema) Parameters(l *Link) map[string]string {
 	params := make(map[string]string)
 	if l.HRef == nil {
 		// No HRef property
-		goto Rel
+		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
-	for name, def := range l.HRef.Resolve(s) {
-		params[name] = s.GoType(def)
+	for name, def := range l.HRef.Resolve(r) {
+		params[name] = r.GoType(def)
 	}
-Rel:
 	switch l.Rel {
 	case "update", "create":
-		params["o"] = l.GoType(s)
+		params["o"] = l.GoType(r)
 	case "instances":
 		params["lr"] = "*ListRange"
 	}
@@ -170,7 +184,7 @@ Rel:
 }
 
 // Return function return values types.
-func (s *Schema) Values(name string, l *Link) []string {
+func (r *Schema) Values(name string, l *Link) []string {
 	var values []string
 	name = initialCap(name)
 	switch l.Rel {
@@ -184,8 +198,9 @@ func (s *Schema) Values(name string, l *Link) []string {
 	return values
 }
 
-func (s *Schema) URL() string {
-	for _, l := range s.Links {
+// Return base URL
+func (r *Schema) URL() string {
+	for _, l := range r.Links {
 		if l.Rel == "self" {
 			return l.HRef.String()
 		}
@@ -198,5 +213,5 @@ func (l *Link) GoType(r *Schema) string {
 	if l.Schema.Type == nil {
 		l.Schema.Type = "object"
 	}
-	return r.GoType(l.Schema)
+	return r.goType(l.Schema, true, false)
 }
