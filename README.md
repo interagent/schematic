@@ -17,7 +17,7 @@ $ go get github.com/heroku/schematic
 Run it against your schema:
 
 ```console
-$ schematic api.json > heroku/heroku.go 
+$ schematic platform-api.json > heroku/heroku.go
 ```
 
 This will generate a Go package named after your schema:
@@ -38,6 +38,23 @@ if err != nil {
 for _, addon := range addons {
   fmt.Println(addon.Name)
 }
+```
+
+A Service takes an optional ``http.Client`` as argument.
+As an example, if your service use
+[OAuth2](http://code.google.com/p/goauth2/) for authentication:
+
+```go
+var config = &oauth.Config{
+  ...
+}
+transport := &oauth.Transport{
+  Token:     token,
+  Config:    config,
+  Transport: http.DefaultTransport,
+}
+httpClient := transport.Client()
+s := api.NewService(httpClient)
 ```
 
 ## Development
