@@ -66,6 +66,11 @@ var typeTests = []struct {
 		Schema: &Schema{
 			Type:                 "object",
 			AdditionalProperties: false,
+			PatternProperties: map[string]*Schema{
+				"^\\w+$": {
+					Type: "string",
+				},
+			},
 		},
 		Type: "map[string]string",
 	},

@@ -127,9 +127,11 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 			goType = "[]" + r.goType(def.Items, required, force)
 		case "object":
 			// Check if additionalProperties is false.
-			if m, ok := def.AdditionalProperties.(bool); ok && !m {
-				goType = "map[string]string"
-				continue
+			if a, ok := def.AdditionalProperties.(bool); ok && !a {
+				if def.PatternProperties != nil {
+					goType = "map[string]string"
+					continue
+				}
 			}
 			buf := bytes.NewBufferString("struct {")
 			for name, prop := range def.Properties {
