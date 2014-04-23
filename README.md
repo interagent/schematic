@@ -30,13 +30,19 @@ package heroku
 You then would be able to use the package as follow:
 
 ```go
-h := heroku.NewService(nil)
-addons, err := h.AddonList("schematic", nil)
-if err != nil {
-  ...
-}
-for _, addon := range addons {
-  fmt.Println(addon.Name)
+package main
+
+import "./heroku"
+
+func main() {
+  h := heroku.NewService(nil)
+  addons, err := h.AddonServiceList(nil)
+  if err != nil {
+    panic(err)
+  }
+  for _, addon := range addons {
+    fmt.Println(addon.Name)
+  }
 }
 ```
 
