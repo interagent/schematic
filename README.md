@@ -40,9 +40,13 @@ for _, addon := range addons {
 }
 ```
 
-A Service takes an optional ``http.Client`` as argument.
-As an example, if your service use
-[OAuth2](http://code.google.com/p/goauth2/) for authentication:
+A Service takes an optional [`http.Client`](http://golang.org/pkg/net/http/#Client)
+as argument. This Client will need to handle any HTTP-related details
+unique to the target API service such as request authorization, request
+header setup, error handling, response debugging, etc.
+
+As an example, if your service use [OAuth2](http://code.google.com/p/goauth2/)
+for authentication:
 
 ```go
 var config = &oauth.Config{
