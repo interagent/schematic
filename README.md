@@ -61,6 +61,9 @@ httpClient := transport.Client()
 s := api.NewService(httpClient)
 ```
 
+For an example of a service using HTTP Basic Auth, see the generated
+[heroku-go client](https://github.com/cyberdelia/heroku-go/blob/master/v3/transport.go).
+
 ## Development
 
 Schematic bundles templated Go code into a Go source file via the
