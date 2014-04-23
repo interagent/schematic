@@ -1,6 +1,6 @@
 # Schematic
 
-Generate Go client code for HTTP APIs described by [JSON Schemas](http://json-schema.org/).
+Generate Go client code for HTTP APIs described by [JSON Hyper-Schemas](http://json-schema.org/latest/json-schema-hypermedia.html).
 
 ## Installation
 
