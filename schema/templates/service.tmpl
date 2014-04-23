@@ -142,9 +142,9 @@ func Bool(v bool) *bool {
 	return p
 }
 
-// Int64 allocates a new int64 value returns a pointer to it.
-func Int64(v int64) *int64 {
-	p := new(int64)
+// Int allocates a new int value returns a pointer to it.
+func Int(v int) *int {
+	p := new(int)
 	*p = v
 	return p
 }

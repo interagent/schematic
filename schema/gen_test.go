@@ -26,7 +26,7 @@ var typeTests = []struct {
 		Schema: &Schema{
 			Type: "integer",
 		},
-		Type: "int64",
+		Type: "int",
 	},
 	{
 		Schema: &Schema{
@@ -79,7 +79,7 @@ var typeTests = []struct {
 			},
 			Required: []string{"counter"},
 		},
-		Type: "Counter int64",
+		Type: "Counter int",
 	},
 	{
 		Schema: &Schema{
@@ -150,7 +150,7 @@ var paramsTests = []struct {
 		Schema: &Schema{},
 		Link: &Link{
 			HRef: NewHRef("/destroy/"),
-			Rel: "destroy",
+			Rel:  "destroy",
 		},
 		Parameters: map[string]string{},
 	},
@@ -158,7 +158,7 @@ var paramsTests = []struct {
 		Schema: &Schema{},
 		Link: &Link{
 			HRef: NewHRef("/instances/"),
-			Rel: "instances",
+			Rel:  "instances",
 		},
 		Parameters: map[string]string{
 			"lr": "*ListRange",
@@ -167,7 +167,7 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			Rel: "update",
+			Rel:  "update",
 			HRef: NewHRef("/update/"),
 			Schema: &Schema{
 				Type: "string",

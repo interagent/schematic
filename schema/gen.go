@@ -120,7 +120,7 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 		case "number":
 			goType = "float64"
 		case "integer":
-			goType = "int64"
+			goType = "int"
 		case "any":
 			goType = "interface{}"
 		case "array":
