@@ -43,7 +43,17 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 		)
 	{{end}}
 {{end}}`,
-	"package.tmpl": `package {{.}}
+	"package.tmpl": `// Generated service client for {{.}} API.
+//
+// To be able to interact with this API, you have to
+// create a new service:
+//
+//     s := {{.}}.NewService(nil)
+//
+// The Service struct has all the methods you need
+// to interact with {{.}} API.
+//
+package {{.}}
 `,
 	"service.tmpl": `const (
 	Version          = "{{.Version}}"
@@ -232,3 +242,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+
