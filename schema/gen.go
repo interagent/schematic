@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	bundle "github.com/heroku/schematic/schema/templates"
+	bundle "github.com/interagent/schematic/schema/templates"
 )
 
 var templates *template.Template

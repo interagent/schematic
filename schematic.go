@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/heroku/schematic/schema"
+	"github.com/interagent/schematic/schema"
 )
 
 func main() {

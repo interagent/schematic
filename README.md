@@ -7,7 +7,7 @@ Generate Go client code for HTTP APIs described by [JSON Schemas](http://json-sc
 Download and install:
 
 ```console
-$ go get github.com/heroku/schematic
+$ go get github.com/interagent/schematic
 ```
 
 **Warning**: schematic requires Go >= 1.2.
