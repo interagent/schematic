@@ -1,3 +1,17 @@
+// Schematic
+//
+// Generate Go client code for HTTP APIs
+// described by JSON Hyper-Schemas: http://json-schema.org/latest/json-schema-hypermedia.html.
+//
+// Run it against your schema:
+//
+//     $ schematic platform-api.json > heroku/heroku.go
+//
+// This will generate a Go package named after your schema:
+//
+//     package heroku
+//     ...
+//
 package main
 
 import (
