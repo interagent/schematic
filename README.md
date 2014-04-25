@@ -70,6 +70,10 @@ s := api.NewService(httpClient)
 For an example of a service using HTTP Basic Auth, see the generated
 [heroku-go client](https://github.com/cyberdelia/heroku-go/blob/master/v3/transport.go).
 
+In general, creating a custom [`http.Transport`](http://golang.org/pkg/net/http/#Transport)
+and creating a client from that is a common way to get an appropriate
+`http.Client` for your service.
+
 ## Development
 
 Schematic bundles templated Go code into a Go source file via the
