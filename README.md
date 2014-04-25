@@ -12,7 +12,7 @@ $ go get -u github.com/interagent/schematic
 
 **Warning**: schematic requires Go >= 1.2.
 
-## Usage
+## Client Generation
 
 Run it against your schema:
 
@@ -26,6 +26,8 @@ This will generate a Go package named after your schema:
 package heroku
 ...
 ```
+
+## Client Usage
 
 You then would be able to use the package as follow:
 
