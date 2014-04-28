@@ -85,12 +85,12 @@ and creating or updating a resource.
 Reading a single resource looks like this, for example:
 
 ```go
-    app, err := h.AppInfo("my-app")
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println(app.Name)
-    fmt.Printf("%+v\n", app)
+app, err := h.AppInfo("my-app")
+if err != nil {
+   panic(err)
+}
+fmt.Println(app.Name)
+fmt.Printf("%+v\n", app)
 ```
 
 Where the struct `app` is of a type e.g. `heroku.App` defined in the
@@ -100,13 +100,13 @@ various fields included in the API response.
 Methods to read a list of resources look similar, for example:
 
 ```go
-    apps, err := h.AppList(nil)
-    if err != nil {
-        panic(err)
-    }
-    for _, app := range apps {
-        fmt.Println(app.Name)
-    }
+apps, err := h.AppList(nil)
+if err != nil {
+    panic(err)
+}
+for _, app := range apps {
+    fmt.Println(app.Name)
+}
 ```
 
 The first return value of these methods is a slice of domain structs
@@ -118,15 +118,15 @@ ordering and pagination range options on the underlying list call.
 Methods to create or update look like this, for example:
 
 ```go
-    newName := "my-app"
-    updateOpts := heroku.AppUpdateOpts{
-        Name: &newName,
-    }
-    app, err := h.AppUpdate("my-renamed-app", updateOpts)
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println(app.Name)
+newName := "my-app"
+updateOpts := heroku.AppUpdateOpts{
+    Name: &newName,
+}
+app, err := h.AppUpdate("my-renamed-app", updateOpts)
+if err != nil {
+    panic(err)
+}
+fmt.Println(app.Name)
 ```
 
 Note the availability of generated types of with suffixes `UpdateOpts`
