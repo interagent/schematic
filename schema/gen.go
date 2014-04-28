@@ -39,8 +39,8 @@ func (r *Schema) Generate() ([]byte, error) {
 		Version: r.Version,
 	})
 
-	for name, schema := range r.Properties {
-		schema := r.Resolve(schema)
+	for _, name := range sortedKeys(r.Properties) {
+		schema := r.Resolve(r.Properties[name])
 		// Skipping definitions because there is no links, nor properties.
 		if schema.Links == nil && schema.Properties == nil {
 			continue
@@ -134,7 +134,8 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 				}
 			}
 			buf := bytes.NewBufferString("struct {")
-			for name, prop := range def.Properties {
+			for _, name := range sortedKeys(def.Properties) {
+				prop := def.Properties[name]
 				req := contains(name, def.Required) || force
 				templates.ExecuteTemplate(buf, "field.tmpl", struct {
 					Definition *Schema
@@ -167,22 +168,26 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 }
 
 // Return function parameters names and types.
-func (r *Schema) Parameters(l *Link) map[string]string {
-	params := make(map[string]string)
+func (r *Schema) Parameters(l *Link) (names []string, types []string) {
 	if l.HRef == nil {
 		// No HRef property
 		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
-	for name, def := range l.HRef.Resolve(r) {
-		params[name] = r.GoType(def)
+	identities := l.HRef.Resolve(r)
+	for _, name := range sortedKeys(identities) {
+		def := identities[name]
+		names = append(names, name)
+		types = append(types, r.GoType(def))
 	}
 	switch l.Rel {
 	case "update", "create":
-		params["o"] = l.GoType(r)
+		names = append(names, "o")
+		types = append(types, l.GoType(r))
 	case "instances":
-		params["lr"] = "*ListRange"
+		names = append(names, "lr")
+		types = append(types, "*ListRange")
 	}
-	return params
+	return names, types
 }
 
 // Return function return values types.

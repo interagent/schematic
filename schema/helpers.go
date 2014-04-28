@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"text/template"
 	"unicode"
@@ -125,8 +126,9 @@ func values(s *Schema, n string, l *Link) string {
 
 func params(s *Schema, l *Link) string {
 	var p []string
-	for k, v := range s.Parameters(l) {
-		p = append(p, fmt.Sprintf("%s %s", initialLow(k), v))
+	names, types := s.Parameters(l)
+	for i, n := range names {
+		p = append(p, fmt.Sprintf("%s %s", initialLow(n), types[i]))
 	}
 	return strings.Join(p, ", ")
 }
@@ -137,4 +139,12 @@ func args(s *Schema, h *HRef) string {
 		p = append(p, k)
 	}
 	return strings.Join(p, ", ")
+}
+
+func sortedKeys(m map[string]*Schema) (keys []string) {
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return
 }
