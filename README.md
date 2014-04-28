@@ -91,7 +91,6 @@ Reading a single resource looks like this, for example:
     }
     fmt.Println(app.Name)
     fmt.Printf("%+v\n", app)
-    }
 ```
 
 Where the struct `app` is of a type e.g. `heroku.App` defined in the
@@ -105,7 +104,9 @@ Methods to read a list of resources look similar, for example:
     if err != nil {
         panic(err)
     }
-    for fmt.Println(app.Name)
+    for _, app := range apps {
+        fmt.Println(app.Name)
+    }
 ```
 
 The first return value of these methods is a slice of domain structs
