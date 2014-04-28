@@ -147,9 +147,10 @@ func TestLinkType(t *testing.T) {
 }
 
 var paramsTests = []struct {
-	Schema     *Schema
-	Link       *Link
-	Parameters map[string]string
+	Schema *Schema
+	Link   *Link
+	Names  []string
+	Types  []string
 }{
 	{
 		Schema: &Schema{},
@@ -157,7 +158,6 @@ var paramsTests = []struct {
 			HRef: NewHRef("/destroy/"),
 			Rel:  "destroy",
 		},
-		Parameters: map[string]string{},
 	},
 	{
 		Schema: &Schema{},
@@ -165,9 +165,8 @@ var paramsTests = []struct {
 			HRef: NewHRef("/instances/"),
 			Rel:  "instances",
 		},
-		Parameters: map[string]string{
-			"lr": "*ListRange",
-		},
+		Names: []string{"lr"},
+		Types: []string{"*ListRange"},
 	},
 	{
 		Schema: &Schema{},
@@ -178,9 +177,8 @@ var paramsTests = []struct {
 				Type: "string",
 			},
 		},
-		Parameters: map[string]string{
-			"o": "string",
-		},
+		Names: []string{"o"},
+		Types: []string{"string"},
 	},
 	{
 		Schema: &Schema{
@@ -197,18 +195,21 @@ var paramsTests = []struct {
 		Link: &Link{
 			HRef: NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
 		},
-		Parameters: map[string]string{
-			"structUUID": "string",
-		},
+		Names: []string{"structUUID"},
+		Types: []string{"string"},
 	},
 }
 
 func TestParameters(t *testing.T) {
 	for i, pt := range paramsTests {
-		params := pt.Schema.Parameters(pt.Link)
-		if !reflect.DeepEqual(params, pt.Parameters) {
-			t.Errorf("%d: wants %v, got %v", i, pt.Parameters, params)
+		names, types := pt.Schema.Parameters(pt.Link)
+		if !reflect.DeepEqual(names, pt.Names) {
+			t.Errorf("%d: wants %v, got %v", i, pt.Names, names)
 		}
+		if !reflect.DeepEqual(types, pt.Types) {
+			t.Errorf("%d: wants %v, got %v", i, pt.Types, types)
+		}
+
 	}
 }
 
