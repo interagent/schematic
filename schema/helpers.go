@@ -119,8 +119,8 @@ func asComment(c string) string {
 	return buf.String()
 }
 
-func values(s *Schema, n string, l *Link) string {
-	v := s.Values(n, l)
+func values(r *Schema, n string, s *Schema, l *Link) string {
+	v := r.Values(n, s, l)
 	return strings.Join(v, ", ")
 }
 

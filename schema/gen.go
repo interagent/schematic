@@ -17,7 +17,7 @@ func init() {
 	templates = template.Must(bundle.Parse(templates))
 }
 
-// Generate code according to the schema.
+// Generate generates code according to the schema.
 func (r *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
@@ -71,7 +71,7 @@ func (r *Schema) Generate() ([]byte, error) {
 	return clean, nil
 }
 
-// Resolve reference inside the schema.
+// Resolve resolves reference inside the schema.
 func (r *Schema) Resolve(s *Schema) *Schema {
 	if s.Ref != nil {
 		s = s.Ref.Resolve(r)
@@ -85,6 +85,7 @@ func (r *Schema) Resolve(s *Schema) *Schema {
 	return s
 }
 
+// Types returns the array of types described by this schema.
 func (r *Schema) Types() (types []string) {
 	if arr, ok := r.Type.([]interface{}); ok {
 		for _, v := range arr {
@@ -96,11 +97,12 @@ func (r *Schema) Types() (types []string) {
 	return types
 }
 
-// Return Go type for the given schema as string.
+// GoType returns the Go type for the given schema as string.
 func (r *Schema) GoType(s *Schema) string {
 	return r.goType(s, true, true)
 }
 
+// IsCustomType returns true if the schema declares a custom type.
 func (r *Schema) IsCustomType() bool {
 	return len(r.Properties) > 0
 }
@@ -172,7 +174,7 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 	return goType
 }
 
-// Return function parameters names and types.
+// Parameters returns function parameters names and types.
 func (r *Schema) Parameters(l *Link) (names []string, types []string) {
 	if l.HRef == "" {
 		// No HRef property
@@ -195,7 +197,7 @@ func (r *Schema) Parameters(l *Link) (names []string, types []string) {
 	return names, types
 }
 
-// Return function return values types.
+// Values returns function return values types.
 func (r *Schema) Values(name string, def *Schema, l *Link) []string {
 	var values []string
 	name = initialCap(name)
@@ -214,7 +216,7 @@ func (r *Schema) Values(name string, def *Schema, l *Link) []string {
 	return values
 }
 
-// Return base URL
+// URL return schema base URL.
 func (r *Schema) URL() string {
 	for _, l := range r.Links {
 		if l.Rel == "self" {
@@ -224,7 +226,7 @@ func (r *Schema) URL() string {
 	return ""
 }
 
-// Return Go type for the given schema as string.
+// GoType returns Go type for the given schema as string.
 func (l *Link) GoType(r *Schema) string {
 	if l.Schema.Type == nil {
 		l.Schema.Type = "object"

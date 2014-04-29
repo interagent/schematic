@@ -241,13 +241,13 @@ var valuesTests = []struct {
 		Link: &Link{
 			Rel: "self",
 		},
-		Values: []string{"*Result", "error"},
+		Values: []string{"Result", "error"},
 	},
 }
 
 func TestValues(t *testing.T) {
 	for i, vt := range valuesTests {
-		values := vt.Schema.Values(vt.Name, vt.Link)
+		values := vt.Schema.Values(vt.Name, vt.Schema, vt.Link)
 		if !reflect.DeepEqual(values, vt.Values) {
 			t.Errorf("%d: wants %v, got %v", i, vt.Values, values)
 		}

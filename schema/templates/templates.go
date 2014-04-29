@@ -6,18 +6,19 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 `,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Root := .Root}}
+{{$Def := .Definition}}
 {{range .Definition.Links}}
   {{if eq .Rel "update" "create" }}
    type {{printf "%s-%s-Opts" $Name .Title | initialCap}} {{.GoType $Root}}
   {{end}}
 
   {{asComment .Description}}
-  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name .}}) {
+  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name $Def .}}) {
     {{if eq .Rel "destroy"}}
       return s.Delete(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
     {{else if eq .Rel "self"}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), nil)
+      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), nil)
     {{else if eq .Rel "instances"}}
       {{$Var := printf "%s-%s" $Name "List" | initialLow}}
       var {{$Var}} []*{{initialCap $Name}}
@@ -26,7 +27,7 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
       return s.{{methodCap .Method}}(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return &{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), o)
+      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), o)
     {{end}}
   }
 {{end}}
@@ -242,4 +243,3 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
-
