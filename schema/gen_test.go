@@ -155,14 +155,14 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			HRef: NewHRef("/destroy/"),
+			HRef: HRef("/destroy/"),
 			Rel:  "destroy",
 		},
 	},
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			HRef: NewHRef("/instances/"),
+			HRef: HRef("/instances/"),
 			Rel:  "instances",
 		},
 		Names: []string{"lr"},
@@ -172,7 +172,7 @@ var paramsTests = []struct {
 		Schema: &Schema{},
 		Link: &Link{
 			Rel:  "update",
-			HRef: NewHRef("/update/"),
+			HRef: HRef("/update/"),
 			Schema: &Schema{
 				Type: "string",
 			},
@@ -193,7 +193,7 @@ var paramsTests = []struct {
 			},
 		},
 		Link: &Link{
-			HRef: NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
+			HRef: HRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
 		},
 		Names: []string{"structUUID"},
 		Types: []string{"string"},

@@ -44,7 +44,7 @@ var resolveTests = []struct {
 
 func TestReferenceResolve(t *testing.T) {
 	for i, rt := range resolveTests {
-		ref := NewReference(rt.Ref)
+		ref := Reference(rt.Ref)
 		rsl := ref.Resolve(rt.Schema)
 		if !reflect.DeepEqual(rsl, rt.Resolved) {
 			t.Errorf("%d: resolved schema don't match, got %v, wants %v", i, rsl, rt.Resolved)
@@ -109,7 +109,7 @@ var hrefTests = []struct {
 
 func TestHREfResolve(t *testing.T) {
 	for i, ht := range hrefTests {
-		href := NewHRef(ht.HRef)
+		href := HRef(ht.HRef)
 		rsl := href.Resolve(ht.Schema)
 		if !reflect.DeepEqual(rsl, ht.Resolved) {
 			t.Errorf("%d: resolved schemas don't match, got %v, wants %v", i, rsl, ht.Resolved)
@@ -118,7 +118,7 @@ func TestHREfResolve(t *testing.T) {
 }
 
 func TestHRefString(t *testing.T) {
-	href := NewHRef("/app/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}")
+	href := HRef("/app/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}")
 	if href.String() != "/app/%v" {
 		t.Errorf("wants %v, got %v", "/app/%v", href.String())
 	}

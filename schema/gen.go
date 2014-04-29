@@ -101,6 +101,10 @@ func (r *Schema) GoType(s *Schema) string {
 	return r.goType(s, true, true)
 }
 
+func (r *Schema) IsCustomType() bool {
+	return len(r.Properties) > 0
+}
+
 func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 	// Resolve JSON reference/pointer
 	def := r.Resolve(s)
@@ -129,6 +133,7 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 			// Check if additionalProperties is false.
 			if a, ok := def.AdditionalProperties.(bool); ok && !a {
 				if def.PatternProperties != nil {
+					required = false
 					goType = "map[string]string"
 					continue
 				}
@@ -169,7 +174,7 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 
 // Return function parameters names and types.
 func (r *Schema) Parameters(l *Link) (names []string, types []string) {
-	if l.HRef == nil {
+	if l.HRef == "" {
 		// No HRef property
 		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
@@ -191,7 +196,7 @@ func (r *Schema) Parameters(l *Link) (names []string, types []string) {
 }
 
 // Return function return values types.
-func (r *Schema) Values(name string, l *Link) []string {
+func (r *Schema) Values(name string, def *Schema, l *Link) []string {
 	var values []string
 	name = initialCap(name)
 	switch l.Rel {
@@ -200,7 +205,11 @@ func (r *Schema) Values(name string, l *Link) []string {
 	case "instances":
 		values = append(values, fmt.Sprintf("[]*%s", name), "error")
 	default:
-		values = append(values, fmt.Sprintf("*%s", name), "error")
+		if def.IsCustomType() {
+			values = append(values, fmt.Sprintf("*%s", name), "error")
+		} else {
+			values = append(values, fmt.Sprintf("%s", name), "error")
+		}
 	}
 	return values
 }
