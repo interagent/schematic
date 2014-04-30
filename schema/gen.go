@@ -142,7 +142,7 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 			}
 			buf := bytes.NewBufferString("struct {")
 			for _, name := range sortedKeys(def.Properties) {
-				prop := def.Properties[name]
+				prop := r.Resolve(def.Properties[name])
 				req := contains(name, def.Required) || force
 				templates.ExecuteTemplate(buf, "field.tmpl", struct {
 					Definition *Schema
