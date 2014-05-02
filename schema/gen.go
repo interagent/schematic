@@ -135,8 +135,10 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 			// Check if additionalProperties is false.
 			if a, ok := def.AdditionalProperties.(bool); ok && !a {
 				if def.PatternProperties != nil {
-					required = false
-					goType = "map[string]string"
+					for _, prop := range def.PatternProperties {
+						goType = fmt.Sprintf("map[string]%s", r.GoType(prop))
+						break // We don't support more than one pattern for now.
+					}
 					continue
 				}
 			}
@@ -212,7 +214,7 @@ func (r *Schema) Values(name string, def *Schema, l *Link) []string {
 		if def.IsCustomType() {
 			values = append(values, fmt.Sprintf("*%s", name), "error")
 		} else {
-			values = append(values, fmt.Sprintf("%s", name), "error")
+			values = append(values, r.GoType(def), "error")
 		}
 	}
 	return values

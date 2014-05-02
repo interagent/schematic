@@ -76,6 +76,18 @@ var typeTests = []struct {
 	},
 	{
 		Schema: &Schema{
+			Type:                 "object",
+			AdditionalProperties: false,
+			PatternProperties: map[string]*Schema{
+				"^\\w+$": {
+					Type: []interface{}{"string", "null"},
+				},
+			},
+		},
+		Type: "map[string]*string",
+	},
+	{
+		Schema: &Schema{
 			Type: "object",
 			Properties: map[string]*Schema{
 				"counter": {
@@ -238,12 +250,36 @@ var valuesTests = []struct {
 		Values: []string{"[]*Result", "error"},
 	},
 	{
-		Schema: &Schema{},
-		Name:   "Result",
+		Schema: &Schema{
+			Type: "object",
+			Properties: map[string]*Schema{
+				"value": {
+					Type: "integer",
+				},
+			},
+			Required: []string{"value"},
+		},
+		Name: "Result",
 		Link: &Link{
 			Rel: "self",
 		},
-		Values: []string{"Result", "error"},
+		Values: []string{"*Result", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type:                 "object",
+			AdditionalProperties: false,
+			PatternProperties: map[string]*Schema{
+				"^\\w+$": {
+					Type: "string",
+				},
+			},
+		},
+		Name: "ConfigVar",
+		Link: &Link{
+			Rel: "self",
+		},
+		Values: []string{"map[string]string", "error"},
 	},
 }
 
