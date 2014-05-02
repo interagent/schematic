@@ -55,6 +55,7 @@ func TestReferenceResolve(t *testing.T) {
 var hrefTests = []struct {
 	HRef     string
 	Schema   *Schema
+	Order    []string
 	Resolved map[string]*Schema
 }{
 	{
@@ -70,6 +71,7 @@ var hrefTests = []struct {
 				},
 			},
 		},
+		Order: []string{"appUUID"},
 		Resolved: map[string]*Schema{
 			"appUUID": {
 				Title: "Identifier",
@@ -96,6 +98,7 @@ var hrefTests = []struct {
 				},
 			},
 		},
+		Order: []string{"appIdentity", "structIdentity"},
 		Resolved: map[string]*Schema{
 			"appIdentity": {
 				Title: "App Identifier",
@@ -110,9 +113,12 @@ var hrefTests = []struct {
 func TestHREfResolve(t *testing.T) {
 	for i, ht := range hrefTests {
 		href := HRef(ht.HRef)
-		rsl := href.Resolve(ht.Schema)
-		if !reflect.DeepEqual(rsl, ht.Resolved) {
-			t.Errorf("%d: resolved schemas don't match, got %v, wants %v", i, rsl, ht.Resolved)
+		order, resolved := href.Resolve(ht.Schema)
+		if !reflect.DeepEqual(order, ht.Order) {
+			t.Errorf("%d: resolved order don't match, got %v, wants %v", i, order, ht.Order)
+		}
+		if !reflect.DeepEqual(resolved, ht.Resolved) {
+			t.Errorf("%d: resolved schemas don't match, got %v, wants %v", i, resolved, ht.Resolved)
 		}
 	}
 }

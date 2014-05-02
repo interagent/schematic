@@ -81,7 +81,8 @@ func parseTag(tag string) string {
 
 type HRef string
 
-func (h HRef) Resolve(r *Schema) map[string]*Schema {
+func (h HRef) Resolve(r *Schema) ([]string, map[string]*Schema) {
+	order := make([]string, 0)
 	schemas := make(map[string]*Schema)
 	for _, v := range href.FindAllString(string(h), -1) {
 		u, err := url.QueryUnescape(v[2 : len(v)-2])
@@ -90,9 +91,10 @@ func (h HRef) Resolve(r *Schema) map[string]*Schema {
 		}
 		parts := strings.Split(u, "/")
 		name := initialLow(fmt.Sprintf("%s-%s", parts[len(parts)-3], parts[len(parts)-1]))
+		order = append(order, name)
 		schemas[name] = Reference(u).Resolve(r)
 	}
-	return schemas
+	return order, schemas
 }
 
 func (h HRef) URL() (*url.URL, error) {

@@ -175,26 +175,28 @@ func (r *Schema) goType(s *Schema, required bool, force bool) (goType string) {
 }
 
 // Parameters returns function parameters names and types.
-func (r *Schema) Parameters(l *Link) (names []string, types []string) {
+func (r *Schema) Parameters(l *Link) ([]string, map[string]string) {
 	if l.HRef == "" {
 		// No HRef property
 		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
-	identities := l.HRef.Resolve(r)
-	for _, name := range sortedKeys(identities) {
+	order := make([]string, 0)
+	params := make(map[string]string)
+	keys, identities := l.HRef.Resolve(r)
+	for _, name := range keys {
 		def := identities[name]
-		names = append(names, name)
-		types = append(types, r.GoType(def))
+		order = append(order, name)
+		params[name] = r.GoType(def)
 	}
 	switch l.Rel {
 	case "update", "create":
-		names = append(names, "o")
-		types = append(types, l.GoType(r))
+		order = append(order, "o")
+		params["o"] = l.GoType(r)
 	case "instances":
-		names = append(names, "lr")
-		types = append(types, "*ListRange")
+		order = append(order, "lr")
+		params["lr"] = "*ListRange"
 	}
-	return names, types
+	return order, params
 }
 
 // Values returns function return values types.

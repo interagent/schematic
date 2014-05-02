@@ -126,19 +126,16 @@ func values(r *Schema, n string, s *Schema, l *Link) string {
 
 func params(s *Schema, l *Link) string {
 	var p []string
-	names, types := s.Parameters(l)
-	for i, n := range names {
-		p = append(p, fmt.Sprintf("%s %s", initialLow(n), types[i]))
+	order, params := s.Parameters(l)
+	for _, n := range order {
+		p = append(p, fmt.Sprintf("%s %s", initialLow(n), params[n]))
 	}
 	return strings.Join(p, ", ")
 }
 
 func args(s *Schema, h *HRef) string {
-	var p []string
-	for k := range h.Resolve(s) {
-		p = append(p, k)
-	}
-	return strings.Join(p, ", ")
+	keys, _ := h.Resolve(s)
+	return strings.Join(keys, ", ")
 }
 
 func sortedKeys(m map[string]*Schema) (keys []string) {
