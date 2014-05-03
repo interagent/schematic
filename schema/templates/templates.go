@@ -5,29 +5,28 @@ import "text/template"
 var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} {{jsonTag .Name .Required}} {{asComment .Definition.Description}}
 `,
 	"funcs.tmpl": `{{$Name := .Name}}
-{{$Root := .Root}}
 {{$Def := .Definition}}
 {{range .Definition.Links}}
   {{if eq .Rel "update" "create" }}
-   type {{printf "%s-%s-Opts" $Name .Title | initialCap}} {{.GoType $Root}}
+   type {{printf "%s-%s-Opts" $Name .Title | initialCap}} {{.GoType}}
   {{end}}
 
   {{asComment .Description}}
-  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Root .}}) ({{values $Root $Name $Def .}}) {
+  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params .}}) ({{values $Name $Def .}}) {
     {{if eq .Rel "destroy"}}
-      return s.Delete(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
+      return s.Delete(fmt.Sprintf("{{.HRef}}", {{args .HRef}}))
     {{else if eq .Rel "self"}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), nil)
+      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}), nil)
     {{else if eq .Rel "instances"}}
       {{$Var := printf "%s-%s" $Name "List" | initialLow}}
       var {{$Var}} []*{{initialCap $Name}}
-      return {{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), lr)
+      return {{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}), lr)
     {{else if eq .Rel "empty"}}
-      return s.{{methodCap .Method}}(fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}))
+      return s.{{methodCap .Method}}(fmt.Sprintf("{{.HRef}}", {{args .HRef}}))
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{initialCap $Name}}
-      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args $Root .HRef}}), o)
+      return {{if $Def.IsCustomType}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}), o)
     {{end}}
   }
 {{end}}
@@ -222,7 +221,7 @@ func String(v string) *string {
 }
 `,
 	"struct.tmpl": `{{asComment .Definition.Description}}
-type {{initialCap .Name}} {{goType .Root .Definition}}
+type {{initialCap .Name}} {{goType .Definition}}
 `,
 }
 
@@ -243,3 +242,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+

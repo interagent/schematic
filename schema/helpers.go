@@ -29,8 +29,8 @@ var (
 	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}\s]`)
 )
 
-func goType(r *Schema, p *Schema) string {
-	return r.GoType(p)
+func goType(p *Schema) string {
+	return p.GoType()
 }
 
 func required(n string, def *Schema) bool {
@@ -119,23 +119,22 @@ func asComment(c string) string {
 	return buf.String()
 }
 
-func values(r *Schema, n string, s *Schema, l *Link) string {
-	v := r.Values(n, s, l)
+func values(n string, s *Schema, l *Link) string {
+	v := s.Values(n, l)
 	return strings.Join(v, ", ")
 }
 
-func params(s *Schema, l *Link) string {
+func params(l *Link) string {
 	var p []string
-	order, params := s.Parameters(l)
+	order, params := l.Parameters()
 	for _, n := range order {
 		p = append(p, fmt.Sprintf("%s %s", initialLow(n), params[n]))
 	}
 	return strings.Join(p, ", ")
 }
 
-func args(s *Schema, h *HRef) string {
-	keys, _ := h.Resolve(s)
-	return strings.Join(keys, ", ")
+func args(h *HRef) string {
+	return strings.Join(h.Order, ", ")
 }
 
 func sortedKeys(m map[string]*Schema) (keys []string) {

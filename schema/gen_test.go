@@ -109,7 +109,7 @@ var typeTests = []struct {
 
 func TestSchemaType(t *testing.T) {
 	for i, tt := range typeTests {
-		kind := tt.Schema.GoType(tt.Schema)
+		kind := tt.Schema.GoType()
 		if !strings.Contains(kind, tt.Type) {
 			t.Errorf("%d: wants %v, got %v", i, tt.Type, kind)
 		}
@@ -151,7 +151,7 @@ var linkTests = []struct {
 
 func TestLinkType(t *testing.T) {
 	for i, lt := range linkTests {
-		kind := lt.Link.GoType(lt.Link.Schema)
+		kind := lt.Link.GoType()
 		if !strings.Contains(kind, lt.Type) {
 			t.Errorf("%d: wants %v, got %v", i, lt.Type, kind)
 		}
@@ -167,7 +167,7 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			HRef: HRef("/destroy/"),
+			HRef: NewHRef("/destroy/"),
 			Rel:  "destroy",
 		},
 		Order:      []string{},
@@ -176,7 +176,7 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			HRef: HRef("/instances/"),
+			HRef: NewHRef("/instances/"),
 			Rel:  "instances",
 		},
 		Order:      []string{"lr"},
@@ -186,7 +186,7 @@ var paramsTests = []struct {
 		Schema: &Schema{},
 		Link: &Link{
 			Rel:  "update",
-			HRef: HRef("/update/"),
+			HRef: NewHRef("/update/"),
 			Schema: &Schema{
 				Type: "string",
 			},
@@ -207,7 +207,7 @@ var paramsTests = []struct {
 			},
 		},
 		Link: &Link{
-			HRef: HRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
+			HRef: NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
 		},
 		Order:      []string{"structUUID"},
 		Parameters: map[string]string{"structUUID": "string"},
@@ -216,7 +216,8 @@ var paramsTests = []struct {
 
 func TestParameters(t *testing.T) {
 	for i, pt := range paramsTests {
-		order, params := pt.Schema.Parameters(pt.Link)
+		pt.Link.Resolve(pt.Schema)
+		order, params := pt.Link.Parameters()
 		if !reflect.DeepEqual(order, pt.Order) {
 			t.Errorf("%d: wants %v, got %v", i, pt.Order, order)
 		}
@@ -285,7 +286,7 @@ var valuesTests = []struct {
 
 func TestValues(t *testing.T) {
 	for i, vt := range valuesTests {
-		values := vt.Schema.Values(vt.Name, vt.Schema, vt.Link)
+		values := vt.Schema.Values(vt.Name, vt.Link)
 		if !reflect.DeepEqual(values, vt.Values) {
 			t.Errorf("%d: wants %v, got %v", i, vt.Values, values)
 		}

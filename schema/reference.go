@@ -79,30 +79,48 @@ func parseTag(tag string) string {
 	return tag
 }
 
-type HRef string
+type HRef struct {
+	href    string
+	Order   []string
+	Schemas map[string]*Schema
+}
 
-func (h HRef) Resolve(r *Schema) ([]string, map[string]*Schema) {
-	order := make([]string, 0)
-	schemas := make(map[string]*Schema)
-	for _, v := range href.FindAllString(string(h), -1) {
+func NewHRef(href string) *HRef {
+	return &HRef{
+		href: href,
+	}
+}
+
+func (h *HRef) Resolve(r *Schema) {
+	h.Order = make([]string, 0)
+	h.Schemas = make(map[string]*Schema)
+	for _, v := range href.FindAllString(string(h.href), -1) {
 		u, err := url.QueryUnescape(v[2 : len(v)-2])
 		if err != nil {
 			panic(err)
 		}
 		parts := strings.Split(u, "/")
 		name := initialLow(fmt.Sprintf("%s-%s", parts[len(parts)-3], parts[len(parts)-1]))
-		order = append(order, name)
-		schemas[name] = Reference(u).Resolve(r)
+		h.Order = append(h.Order, name)
+		h.Schemas[name] = Reference(u).Resolve(r)
 	}
-	return order, schemas
 }
 
-func (h HRef) URL() (*url.URL, error) {
-	return url.Parse(string(h))
+func (h *HRef) UnmarshalJSON(data []byte) error {
+	h.href = string(data[1 : len(data)-1])
+	return nil
 }
 
-func (h HRef) String() string {
-	return href.ReplaceAllStringFunc(string(h), func(v string) string {
+func (h *HRef) MarshalJSON() ([]byte, error) {
+	return []byte(h.href), nil
+}
+
+func (h *HRef) URL() (*url.URL, error) {
+	return url.Parse(string(h.href))
+}
+
+func (h *HRef) String() string {
+	return href.ReplaceAllStringFunc(string(h.href), func(v string) string {
 		return "%v"
 	})
 }
