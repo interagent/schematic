@@ -112,7 +112,7 @@ func (s *Schema) Types() (types []string) {
 	} else if str, ok := s.Type.(string); ok {
 		types = append(types, str)
 	} else {
-		types = append(types, "object")
+		panic(fmt.Sprintf("unknown type %v", s.Type))
 	}
 	return types
 }
