@@ -17,7 +17,7 @@ var href = regexp.MustCompile(`({\([^\)]+)\)}`)
 
 type Reference string
 
-// Resolve reference.
+// Resolve resolves reference inside a Schema.
 func (rf Reference) Resolve(r *Schema) *Schema {
 	if !strings.HasPrefix(string(rf), fragment) {
 		panic(fmt.Sprintf("non-fragment reference are not supported : %s", rf))
@@ -79,18 +79,21 @@ func parseTag(tag string) string {
 	return tag
 }
 
+// HRef represents a Link href.
 type HRef struct {
 	href    string
 	Order   []string
 	Schemas map[string]*Schema
 }
 
+// NewHRef creates a new HRef struct based on a href value.
 func NewHRef(href string) *HRef {
 	return &HRef{
 		href: href,
 	}
 }
 
+// Resolve resolves a href inside a Schema.
 func (h *HRef) Resolve(r *Schema) {
 	h.Order = make([]string, 0)
 	h.Schemas = make(map[string]*Schema)
@@ -115,6 +118,7 @@ func (h *HRef) MarshalJSON() ([]byte, error) {
 	return []byte(h.href), nil
 }
 
+// URL returns a usable URL for the href.
 func (h *HRef) URL() (*url.URL, error) {
 	return url.Parse(string(h.href))
 }
