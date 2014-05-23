@@ -229,7 +229,7 @@ func (l *Link) Parameters() ([]string, map[string]string) {
 		// No HRef property
 		panic(fmt.Errorf("no href property declared for %s", l.Title))
 	}
-	order := make([]string, 0)
+	var order []string
 	params := make(map[string]string)
 	for _, name := range l.HRef.Order {
 		def := l.HRef.Schemas[name]
