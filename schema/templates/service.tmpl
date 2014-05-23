@@ -9,7 +9,7 @@ type Service struct {
 	client *http.Client
 }
 
-// NewServie creates a Service using the given, if none is provided
+// NewService creates a Service using the given, if none is provided
 // it uses http.DefaultClient.
 func NewService(c *http.Client) *Service {
 	if c == nil {
