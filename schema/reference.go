@@ -15,6 +15,7 @@ const (
 
 var href = regexp.MustCompile(`({\([^\)]+)\)}`)
 
+// Reference represents a 
 type Reference string
 
 // Resolve resolves reference inside a Schema.

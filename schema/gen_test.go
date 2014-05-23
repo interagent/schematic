@@ -170,7 +170,6 @@ var paramsTests = []struct {
 			HRef: NewHRef("/destroy/"),
 			Rel:  "destroy",
 		},
-		Order:      []string{},
 		Parameters: map[string]string{},
 	},
 	{
