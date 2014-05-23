@@ -110,8 +110,8 @@ type ListRange struct {
 	Field      string
 	Max        int
 	Descending bool
-	FirstId    string
-	LastId     string
+	FirstID    string
+	LastID     string
 }
 
 func (lr *ListRange) SetHeader(req *http.Request) {
@@ -119,7 +119,7 @@ func (lr *ListRange) SetHeader(req *http.Request) {
 	if lr.Field != "" {
 		hdrval += lr.Field + " "
 	}
-	hdrval += lr.FirstId + ".." + lr.LastId
+	hdrval += lr.FirstID + ".." + lr.LastID
 	if lr.Max != 0 {
 		hdrval += fmt.Sprintf("; max=%d", lr.Max)
 		if lr.Descending {
