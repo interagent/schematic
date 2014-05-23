@@ -66,7 +66,7 @@ type Service struct {
 	client *http.Client
 }
 
-// Create a Service using the given, if none is provided
+// NewService creates a Service using the given, if none is provided
 // it uses http.DefaultClient.
 func NewService(c *http.Client) *Service {
 	if c == nil {
@@ -77,7 +77,7 @@ func NewService(c *http.Client) *Service {
 	}
 }
 
-// Generates an HTTP request, but does not perform the request.
+// NewRequest generates an HTTP request, but does not perform the request.
 func (s *Service) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	var ctype string
 	var rbody io.Reader
@@ -119,7 +119,7 @@ func (s *Service) NewRequest(method, path string, body interface{}) (*http.Reque
 	return req, nil
 }
 
-// Sends a request and decodes the response into v.
+// Do sends a request and decodes the response into v.
 func (s *Service) Do(v interface{}, method, path string, body interface{}, lr *ListRange) error {
 	req, err := s.NewRequest(method, path, body)
 	if err != nil {
@@ -167,8 +167,8 @@ type ListRange struct {
 	Field      string
 	Max        int
 	Descending bool
-	FirstId    string
-	LastId     string
+	FirstID    string
+	LastID     string
 }
 
 func (lr *ListRange) SetHeader(req *http.Request) {
@@ -176,7 +176,7 @@ func (lr *ListRange) SetHeader(req *http.Request) {
 	if lr.Field != "" {
 		hdrval += lr.Field + " "
 	}
-	hdrval += lr.FirstId + ".." + lr.LastId
+	hdrval += lr.FirstID + ".." + lr.LastID
 	if lr.Max != 0 {
 		hdrval += fmt.Sprintf("; max=%d", lr.Max)
 		if lr.Descending {

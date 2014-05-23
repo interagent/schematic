@@ -15,7 +15,7 @@ const (
 
 var href = regexp.MustCompile(`({\([^\)]+)\)}`)
 
-// Reference represents a 
+// Reference represents a JSON Reference.
 type Reference string
 
 // Resolve resolves reference inside a Schema.
@@ -110,11 +110,13 @@ func (h *HRef) Resolve(r *Schema) {
 	}
 }
 
+// UnmarshalJSON sets *h to a copy of data.
 func (h *HRef) UnmarshalJSON(data []byte) error {
 	h.href = string(data[1 : len(data)-1])
 	return nil
 }
 
+// MarshalJSON returns *h as the JSON encoding of h.
 func (h *HRef) MarshalJSON() ([]byte, error) {
 	return []byte(h.href), nil
 }

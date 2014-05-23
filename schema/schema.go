@@ -1,5 +1,6 @@
 package schema
 
+// Schema represents a JSON Schema.
 type Schema struct {
 	ID          string `json:"id,omitempty"`
 	Title       string `json:"title,omitempty"`
@@ -59,6 +60,7 @@ type Schema struct {
 	Links []Link `json:"links,omitempty"`
 }
 
+// Link represents a Link description.
 type Link struct {
 	Title       string  `json:"title,omitempty"`
 	Description string  `json:"description,omitempty"`
