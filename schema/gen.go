@@ -150,15 +150,13 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 		case "array":
 			goType = "[]" + s.Items.goType(required, force)
 		case "object":
-			// Check if additionalProperties is false.
-			if a, ok := s.AdditionalProperties.(bool); ok && !a {
-				if s.PatternProperties != nil {
-					for _, prop := range s.PatternProperties {
-						goType = fmt.Sprintf("map[string]%s", prop.GoType())
-						break // We don't support more than one pattern for now.
-					}
-					continue
+			// Check if patternProperties exists.
+			if s.PatternProperties != nil {
+				for _, prop := range s.PatternProperties {
+					goType = fmt.Sprintf("map[string]%s", prop.GoType())
+					break // We don't support more than one pattern for now.
 				}
+				continue
 			}
 			buf := bytes.NewBufferString("struct {")
 			for _, name := range sortedKeys(s.Properties) {
