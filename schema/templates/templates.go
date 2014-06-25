@@ -38,10 +38,10 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
   {{else}}
     import (
       {{range .}}
-				"{{.}}"
-			{{end}}
-		)
-	{{end}}
+      	"{{.}}"
+      {{end}}
+    )
+  {{end}}
 {{end}}`,
 	"package.tmpl": `// Generated service client for {{.}} API.
 //
