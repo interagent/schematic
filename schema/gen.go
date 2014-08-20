@@ -148,7 +148,11 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 		case "any":
 			goType = "interface{}"
 		case "array":
-			goType = "[]" + s.Items.goType(required, force)
+			if s.Items != nil {
+				goType = "[]" + s.Items.goType(required, force)
+			} else {
+				goType = "[]interface{}"
+			}
 		case "object":
 			// Check if patternProperties exists.
 			if s.PatternProperties != nil {

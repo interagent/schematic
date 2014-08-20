@@ -64,6 +64,12 @@ var typeTests = []struct {
 	},
 	{
 		Schema: &Schema{
+			Type: "array",
+		},
+		Type: "[]interface{}",
+	},
+	{
+		Schema: &Schema{
 			Type:                 "object",
 			AdditionalProperties: false,
 			PatternProperties: map[string]*Schema{
