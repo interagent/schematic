@@ -1,4 +1,4 @@
-package schema
+package schematic
 
 import (
 	"reflect"

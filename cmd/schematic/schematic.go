@@ -20,7 +20,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/interagent/schematic/schema"
+	"github.com/interagent/schematic"
 )
 
 func main() {
@@ -46,7 +46,7 @@ func main() {
 		}
 	}
 
-	var s schema.Schema
+	var s schematic.Schema
 	d := json.NewDecoder(f)
 	if err := d.Decode(&s); err != nil {
 		log.Fatal(err)

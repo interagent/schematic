@@ -1,4 +1,4 @@
-package schema
+package schematic
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	bundle "github.com/interagent/schematic/schema/templates"
+	bundle "github.com/interagent/schematic/templates"
 )
 
 var templates *template.Template

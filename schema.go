@@ -1,4 +1,4 @@
-package schema
+package schematic
 
 // Schema represents a JSON Schema.
 type Schema struct {
