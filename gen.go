@@ -199,17 +199,21 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 // Values returns function return values types.
 func (s *Schema) Values(name string, l *Link) []string {
 	var values []string
-	name = initialCap(name)
+	name = returnType(name, s, l)
 	switch l.Rel {
 	case "destroy", "empty":
 		values = append(values, "error")
 	case "instances":
-		values = append(values, fmt.Sprintf("[]*%s", name), "error")
+		if l.TargetSchema == nil || s.ReturnsCustomType(l) {
+			values = append(values, fmt.Sprintf("[]*%s", name), "error")
+		} else {
+			values = append(values, fmt.Sprintf("[]*%s", s.ReturnedGoType(l)), "error")
+		}
 	default:
-		if s.IsCustomType() {
+		if s.ReturnsCustomType(l) {
 			values = append(values, fmt.Sprintf("*%s", name), "error")
 		} else {
-			values = append(values, s.GoType(), "error")
+			values = append(values, s.ReturnedGoType(l), "error")
 		}
 	}
 	return values
@@ -223,6 +227,22 @@ func (s *Schema) URL() string {
 		}
 	}
 	return ""
+}
+
+// ReturnsCustomType returns true if the link returns a custom type.
+func (s *Schema) ReturnsCustomType(l *Link) bool {
+	if l.TargetSchema != nil {
+		return len(l.TargetSchema.Properties) > 0
+	}
+	return len(s.Properties) > 0
+}
+
+// ReturnedGoType returns Go type returned by the given link as a string.
+func (s *Schema) ReturnedGoType(l *Link) string {
+	if l.TargetSchema != nil {
+		return l.TargetSchema.goType(true, false)
+	}
+	return s.goType(true, false)
 }
 
 // Parameters returns function parameters names and types.
@@ -253,6 +273,9 @@ func (l *Link) Parameters() ([]string, map[string]string) {
 func (l *Link) Resolve(r *Schema) {
 	if l.Schema != nil {
 		l.Schema = l.Schema.Resolve(r)
+	}
+	if l.TargetSchema != nil {
+		l.TargetSchema = l.TargetSchema.Resolve(r)
 	}
 	l.HRef.Resolve(r)
 }

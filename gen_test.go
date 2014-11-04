@@ -287,6 +287,125 @@ var valuesTests = []struct {
 		},
 		Values: []string{"map[string]string", "error"},
 	},
+	{
+		Schema: &Schema{},
+		Name:   "Result",
+		Link: &Link{
+			Rel:   "instances",
+			Title: "List",
+			TargetSchema: &Schema{
+				Type: "object",
+				Properties: map[string]*Schema{
+					"value": {
+						Type: "integer",
+					},
+				},
+			},
+		},
+		Values: []string{"[]*ResultListResult", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type: "object",
+			Properties: map[string]*Schema{
+				"value": {
+					Type: "integer",
+				},
+			},
+			Required: []string{"value"},
+		},
+		Name: "Result",
+		Link: &Link{
+			Rel:   "self",
+			Title: "Info",
+			TargetSchema: &Schema{
+				Type: "object",
+				Properties: map[string]*Schema{
+					"value": {
+						Type: "integer",
+					},
+				},
+			},
+		},
+		Values: []string{"*ResultInfoResult", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type:                 "object",
+			AdditionalProperties: false,
+			PatternProperties: map[string]*Schema{
+				"^\\w+$": {
+					Type: "string",
+				},
+			},
+		},
+		Name: "ConfigVar",
+		Link: &Link{
+			Rel:   "self",
+			Title: "Info",
+			TargetSchema: &Schema{
+				Type: "object",
+				Properties: map[string]*Schema{
+					"value": {
+						Type: "integer",
+					},
+				},
+			},
+		},
+		Values: []string{"*ConfigVarInfoResult", "error"},
+	},
+	{
+		Schema: &Schema{},
+		Name:   "Result",
+		Link: &Link{
+			Rel:   "instances",
+			Title: "List",
+			TargetSchema: &Schema{
+				Type: "string",
+			},
+		},
+		Values: []string{"[]*string", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type: "object",
+			Properties: map[string]*Schema{
+				"value": {
+					Type: "integer",
+				},
+			},
+			Required: []string{"value"},
+		},
+		Name: "Result",
+		Link: &Link{
+			Rel:   "self",
+			Title: "Info",
+			TargetSchema: &Schema{
+				Type: "string",
+			},
+		},
+		Values: []string{"string", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type:                 "object",
+			AdditionalProperties: false,
+			PatternProperties: map[string]*Schema{
+				"^\\w+$": {
+					Type: "string",
+				},
+			},
+		},
+		Name: "ConfigVar",
+		Link: &Link{
+			Rel:   "self",
+			Title: "Info",
+			TargetSchema: &Schema{
+				Type: "string",
+			},
+		},
+		Values: []string{"string", "error"},
+	},
 }
 
 func TestValues(t *testing.T) {

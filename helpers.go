@@ -12,15 +12,18 @@ import (
 )
 
 var helpers = template.FuncMap{
-	"initialCap": initialCap,
-	"initialLow": initialLow,
-	"methodCap":  methodCap,
-	"asComment":  asComment,
-	"jsonTag":    jsonTag,
-	"params":     params,
-	"args":       args,
-	"values":     values,
-	"goType":     goType,
+	"initialCap":       initialCap,
+	"initialLow":       initialLow,
+	"methodCap":        methodCap,
+	"asComment":        asComment,
+	"jsonTag":          jsonTag,
+	"params":           params,
+	"requestParams":    requestParams,
+	"args":             args,
+	"values":           values,
+	"goType":           goType,
+	"returnType":       returnType,
+	"defineCustomType": defineCustomType,
 }
 
 var (
@@ -133,6 +136,14 @@ func params(l *Link) string {
 	return strings.Join(p, ", ")
 }
 
+func requestParams(l *Link) string {
+	_, params := l.Parameters()
+	if _, ok := params["o"]; ok {
+		return "o"
+	}
+	return "nil"
+}
+
 func args(h *HRef) string {
 	return strings.Join(h.Order, ", ")
 }
@@ -143,4 +154,15 @@ func sortedKeys(m map[string]*Schema) (keys []string) {
 	}
 	sort.Strings(keys)
 	return
+}
+
+func returnType(name string, s *Schema, l *Link) string {
+	if defineCustomType(s, l) {
+		return initialCap(fmt.Sprintf("%s-%s-Result", name, l.Title))
+	}
+	return initialCap(name)
+}
+
+func defineCustomType(s *Schema, l *Link) bool {
+	return l.TargetSchema != nil && s.ReturnsCustomType(l)
 }
