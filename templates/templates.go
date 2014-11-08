@@ -60,13 +60,17 @@ package {{.}}
 `,
 	"service.tmpl": `const (
 	Version          = "{{.Version}}"
-	DefaultAPIURL    = "{{.URL}}"
 	DefaultUserAgent = "{{.Name}}/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
+)
+
+var (
+	DefaultAPIURL    = "{{.URL}}"
 )
 
 // Service represents your API.
 type Service struct {
 	client *http.Client
+	APIURL string
 }
 
 // NewService creates a Service using the given, if none is provided
@@ -77,6 +81,7 @@ func NewService(c *http.Client) *Service {
 	}
 	return &Service{
 		client: c,
+		APIURL: DefaultAPIURL,
 	}
 }
 
@@ -110,7 +115,7 @@ func (s *Service) NewRequest(method, path string, body interface{}) (*http.Reque
 		rbody = bytes.NewReader(j)
 		ctype = "application/json"
 	}
-	req, err := http.NewRequest(method, DefaultAPIURL+path, rbody)
+	req, err := http.NewRequest(method, s.APIURL+path, rbody)
 	if err != nil {
 		return nil, err
 	}
