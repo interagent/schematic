@@ -21,7 +21,9 @@ func init() {
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
-	s.Resolve(nil)
+	for i := 0; i < 2; i++ {
+		s.Resolve(nil)
+	}
 
 	name := strings.ToLower(strings.Split(s.Title, " ")[0])
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
