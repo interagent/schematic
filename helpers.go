@@ -16,14 +16,16 @@ var helpers = template.FuncMap{
 	"initialLow":       initialLow,
 	"methodCap":        methodCap,
 	"asComment":        asComment,
-	"jsonTag":          jsonTag,
+	"fieldTag":         fieldTag,
 	"params":           params,
 	"requestParams":    requestParams,
 	"args":             args,
 	"values":           values,
 	"goType":           goType,
+	"linkGoType":       linkGoType,
 	"returnType":       returnType,
 	"defineCustomType": defineCustomType,
+	"paramType":        paramType,
 }
 
 var (
@@ -36,8 +38,17 @@ func goType(p *Schema) string {
 	return p.GoType()
 }
 
+func linkGoType(l *Link) string {
+	t, _ := l.GoType()
+	return t
+}
+
 func required(n string, def *Schema) bool {
 	return contains(n, def.Required)
+}
+
+func fieldTag(n string, required bool) string {
+	return fmt.Sprintf("`%s %s`", jsonTag(n, required), urlTag(n, required))
 }
 
 func jsonTag(n string, required bool) string {
@@ -45,7 +56,16 @@ func jsonTag(n string, required bool) string {
 	if !required {
 		tags = append(tags, "omitempty")
 	}
-	return fmt.Sprintf("`json:\"%s\"`", strings.Join(tags, ","))
+	return fmt.Sprintf("json:\"%s\"", strings.Join(tags, ","))
+}
+
+func urlTag(n string, required bool) string {
+	tags := []string{n}
+	if !required {
+		tags = append(tags, "omitempty")
+	}
+	tags = append(tags, "key")
+	return fmt.Sprintf("url:\"%s\"", strings.Join(tags, ","))
 }
 
 func contains(n string, r []string) bool {
@@ -127,9 +147,9 @@ func values(n string, s *Schema, l *Link) string {
 	return strings.Join(v, ", ")
 }
 
-func params(l *Link) string {
+func params(name string, l *Link) string {
 	var p []string
-	order, params := l.Parameters()
+	order, params := l.Parameters(name)
 	for _, n := range order {
 		p = append(p, fmt.Sprintf("%s %s", initialLow(n), params[n]))
 	}
@@ -137,11 +157,22 @@ func params(l *Link) string {
 }
 
 func requestParams(l *Link) string {
-	_, params := l.Parameters()
-	if _, ok := params["o"]; ok {
-		return "o"
+	_, params := l.Parameters("")
+	if strings.ToUpper(l.Method) == "DELETE" {
+		return ""
 	}
-	return "nil"
+	p := []string{""}
+	if _, ok := params["o"]; ok {
+		p = append(p, "o")
+	} else {
+		p = append(p, "nil")
+	}
+	if _, ok := params["lr"]; ok {
+		p = append(p, "lr")
+	} else if strings.ToUpper(l.Method) == "GET" {
+		p = append(p, "nil")
+	}
+	return strings.Join(p, ", ")
 }
 
 func args(h *HRef) string {
@@ -159,6 +190,13 @@ func sortedKeys(m map[string]*Schema) (keys []string) {
 func returnType(name string, s *Schema, l *Link) string {
 	if defineCustomType(s, l) {
 		return initialCap(fmt.Sprintf("%s-%s-Result", name, l.Title))
+	}
+	return initialCap(name)
+}
+
+func paramType(name string, l *Link) string {
+	if l.AcceptsCustomType() {
+		return initialCap(fmt.Sprintf("%s-%s-Opts", name, l.Title))
 	}
 	return initialCap(name)
 }

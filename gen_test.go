@@ -157,7 +157,7 @@ var linkTests = []struct {
 
 func TestLinkType(t *testing.T) {
 	for i, lt := range linkTests {
-		kind := lt.Link.GoType()
+		kind, _ := lt.Link.GoType()
 		if !strings.Contains(kind, lt.Type) {
 			t.Errorf("%d: wants %v, got %v", i, lt.Type, kind)
 		}
@@ -217,12 +217,93 @@ var paramsTests = []struct {
 		Order:      []string{"structUUID"},
 		Parameters: map[string]string{"structUUID": "string"},
 	},
+	{
+		Schema: &Schema{},
+		Link: &Link{
+			Title: "update",
+			Rel:   "update",
+			HRef:  NewHRef("/update/"),
+			Schema: &Schema{
+				Properties: map[string]*Schema{
+					"id": &Schema{
+						Type: "string",
+					},
+				},
+				Type: "object",
+			},
+		},
+		Order:      []string{"o"},
+		Parameters: map[string]string{"o": "LinkUpdateOpts"},
+	},
+	{
+		Schema: &Schema{},
+		Link: &Link{
+			Title: "update",
+			Rel:   "update",
+			HRef:  NewHRef("/update/"),
+			Schema: &Schema{
+				Properties: map[string]*Schema{
+					"id": &Schema{
+						Type: "string",
+					},
+				},
+				Type: []interface{}{"object", "null"},
+			},
+		},
+		Order:      []string{"o"},
+		Parameters: map[string]string{"o": "*LinkUpdateOpts"},
+	},
+	{
+		Schema: &Schema{},
+		Link: &Link{
+			Title: "list",
+			Rel:   "instances",
+			HRef:  NewHRef("/list/"),
+			Schema: &Schema{
+				PatternProperties: map[string]*Schema{
+					"^\\w+$": {
+						Type: "string",
+					},
+				},
+				Type: "object",
+			},
+		},
+		Order:      []string{"o", "lr"},
+		Parameters: map[string]string{"o": "map[string]string", "lr": "*ListRange"},
+	},
+	{
+		Schema: &Schema{
+			Definitions: map[string]*Schema{
+				"struct": {
+					Definitions: map[string]*Schema{
+						"uuid": {
+							Type: "string",
+						},
+					},
+				},
+			},
+		},
+		Link: &Link{
+			Title: "check update",
+			HRef:  NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
+			Schema: &Schema{
+				Properties: map[string]*Schema{
+					"id": &Schema{
+						Type: "string",
+					},
+				},
+				Type: "object",
+			},
+		},
+		Order:      []string{"structUUID", "o"},
+		Parameters: map[string]string{"structUUID": "string", "o": "LinkCheckUpdateOpts"},
+	},
 }
 
 func TestParameters(t *testing.T) {
 	for i, pt := range paramsTests {
 		pt.Link.Resolve(pt.Schema)
-		order, params := pt.Link.Parameters()
+		order, params := pt.Link.Parameters("link")
 		if !reflect.DeepEqual(order, pt.Order) {
 			t.Errorf("%d: wants %v, got %v", i, pt.Order, order)
 		}
@@ -248,8 +329,10 @@ var valuesTests = []struct {
 		Values: []string{"error"},
 	},
 	{
-		Schema: &Schema{},
-		Name:   "Result",
+		Schema: &Schema{
+			Type: "object",
+		},
+		Name: "Result",
 		Link: &Link{
 			Rel: "instances",
 		},
@@ -302,7 +385,7 @@ var valuesTests = []struct {
 				},
 			},
 		},
-		Values: []string{"[]*ResultListResult", "error"},
+		Values: []string{"*ResultListResult", "error"},
 	},
 	{
 		Schema: &Schema{

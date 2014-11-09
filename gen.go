@@ -32,6 +32,9 @@ func (s *Schema) Generate() ([]byte, error) {
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
 		"encoding/json", "fmt", "io", "reflect",
 		"net/http", "runtime", "time", "bytes",
+		// TODO: Change for google/go-querystring if pull request #5 gets merged
+		// https://github.com/google/go-querystring/pull/5
+		"github.com/ernesto-jimenez/go-querystring/query",
 	})
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
 		Name    string
@@ -106,7 +109,7 @@ func (s *Schema) Resolve(r *Schema) *Schema {
 }
 
 // Types returns the array of types described by this schema.
-func (s *Schema) Types() (types []string) {
+func (s *Schema) Types() (types []string, err error) {
 	if arr, ok := s.Type.([]interface{}); ok {
 		for _, v := range arr {
 			types = append(types, v.(string))
@@ -114,9 +117,9 @@ func (s *Schema) Types() (types []string) {
 	} else if str, ok := s.Type.(string); ok {
 		types = append(types, str)
 	} else {
-		panic(fmt.Sprintf("unknown type %v", s.Type))
+		err = fmt.Errorf("unknown type %v", s.Type)
 	}
-	return types
+	return types, err
 }
 
 // GoType returns the Go type for the given schema as string.
@@ -131,7 +134,10 @@ func (s *Schema) IsCustomType() bool {
 
 func (s *Schema) goType(required bool, force bool) (goType string) {
 	// Resolve JSON reference/pointer
-	types := s.Types()
+	types, err := s.Types()
+	if err != nil {
+		panic(err)
+	}
 	for _, kind := range types {
 		switch kind {
 		case "boolean":
@@ -202,21 +208,18 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 func (s *Schema) Values(name string, l *Link) []string {
 	var values []string
 	name = returnType(name, s, l)
-	switch l.Rel {
-	case "destroy", "empty":
+	if s.EmptyResult(l) {
 		values = append(values, "error")
-	case "instances":
-		if l.TargetSchema == nil || s.ReturnsCustomType(l) {
+	} else if s.ReturnsCustomType(l) {
+		values = append(values, fmt.Sprintf("*%s", name), "error")
+	} else if l.Rel == "instances" {
+		if l.TargetSchema == nil {
 			values = append(values, fmt.Sprintf("[]*%s", name), "error")
 		} else {
 			values = append(values, fmt.Sprintf("[]*%s", s.ReturnedGoType(l)), "error")
 		}
-	default:
-		if s.ReturnsCustomType(l) {
-			values = append(values, fmt.Sprintf("*%s", name), "error")
-		} else {
-			values = append(values, s.ReturnedGoType(l), "error")
-		}
+	} else {
+		values = append(values, s.ReturnedGoType(l), "error")
 	}
 	return values
 }
@@ -247,8 +250,25 @@ func (s *Schema) ReturnedGoType(l *Link) string {
 	return s.goType(true, false)
 }
 
+// EmptyResult retursn true if the link result should be empty.
+func (s *Schema) EmptyResult(l *Link) bool {
+	var (
+		types []string
+		err   error
+	)
+	if l.TargetSchema != nil {
+		types, err = l.TargetSchema.Types()
+	} else {
+		types, err = s.Types()
+	}
+	if err != nil {
+		return true
+	}
+	return len(types) == 1 && types[0] == "null"
+}
+
 // Parameters returns function parameters names and types.
-func (l *Link) Parameters() ([]string, map[string]string) {
+func (l *Link) Parameters(name string) ([]string, map[string]string) {
 	if l.HRef == nil {
 		// No HRef property
 		panic(fmt.Errorf("no href property declared for %s", l.Title))
@@ -260,15 +280,31 @@ func (l *Link) Parameters() ([]string, map[string]string) {
 		order = append(order, name)
 		params[name] = def.GoType()
 	}
-	switch l.Rel {
-	case "update", "create":
+	if l.Schema != nil {
 		order = append(order, "o")
-		params["o"] = l.GoType()
-	case "instances":
+		t, required := l.GoType()
+		if l.AcceptsCustomType() {
+			params["o"] = paramType(name, l)
+		} else {
+			params["o"] = t
+		}
+		if !required {
+			params["o"] = "*" + params["o"]
+		}
+	}
+	if l.Rel == "instances" {
 		order = append(order, "lr")
 		params["lr"] = "*ListRange"
 	}
 	return order, params
+}
+
+// AcceptsCustomType returns true if the link schema is not a primitive type
+func (l *Link) AcceptsCustomType() bool {
+	if l.Schema != nil && l.Schema.IsCustomType() {
+		return true
+	}
+	return false
 }
 
 // Resolve resolve link schema and href.
@@ -282,7 +318,11 @@ func (l *Link) Resolve(r *Schema) {
 	l.HRef.Resolve(r)
 }
 
-// GoType returns Go type for the given schema as string.
-func (l *Link) GoType() string {
-	return l.Schema.goType(true, false)
+// GoType returns Go type for the given schema as string and a bool specifying whether it is required
+func (l *Link) GoType() (string, bool) {
+	t := l.Schema.goType(true, false)
+	if t[0] == '*' {
+		return t[1:], false
+	}
+	return t, true
 }
