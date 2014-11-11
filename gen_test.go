@@ -181,8 +181,9 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			HRef: NewHRef("/instances/"),
-			Rel:  "instances",
+			HRef:   NewHRef("/instances/"),
+			Rel:    "instances",
+			Method: "get",
 		},
 		Order:      []string{"lr"},
 		Parameters: map[string]string{"lr": "*ListRange"},
@@ -256,9 +257,10 @@ var paramsTests = []struct {
 	{
 		Schema: &Schema{},
 		Link: &Link{
-			Title: "list",
-			Rel:   "instances",
-			HRef:  NewHRef("/list/"),
+			Title:  "list",
+			Rel:    "instances",
+			Method: "get",
+			HRef:   NewHRef("/list/"),
 			Schema: &Schema{
 				PatternProperties: map[string]*Schema{
 					"^\\w+$": {
@@ -330,13 +332,18 @@ var valuesTests = []struct {
 	},
 	{
 		Schema: &Schema{
+			Properties: map[string]*Schema{
+				"value": {
+					Type: "integer",
+				},
+			},
 			Type: "object",
 		},
 		Name: "Result",
 		Link: &Link{
 			Rel: "instances",
 		},
-		Values: []string{"[]*Result", "error"},
+		Values: []string{"*Result", "error"},
 	},
 	{
 		Schema: &Schema{
@@ -447,7 +454,19 @@ var valuesTests = []struct {
 				Type: "string",
 			},
 		},
-		Values: []string{"[]*string", "error"},
+		Values: []string{"string", "error"},
+	},
+	{
+		Schema: &Schema{},
+		Name:   "Result",
+		Link: &Link{
+			Rel:   "instances",
+			Title: "List",
+			TargetSchema: &Schema{
+				Type: []interface{}{"string", "null"},
+			},
+		},
+		Values: []string{"*string", "error"},
 	},
 	{
 		Schema: &Schema{

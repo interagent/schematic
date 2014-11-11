@@ -212,12 +212,6 @@ func (s *Schema) Values(name string, l *Link) []string {
 		values = append(values, "error")
 	} else if s.ReturnsCustomType(l) {
 		values = append(values, fmt.Sprintf("*%s", name), "error")
-	} else if l.Rel == "instances" {
-		if l.TargetSchema == nil {
-			values = append(values, fmt.Sprintf("[]*%s", name), "error")
-		} else {
-			values = append(values, fmt.Sprintf("[]*%s", s.ReturnedGoType(l)), "error")
-		}
 	} else {
 		values = append(values, s.ReturnedGoType(l), "error")
 	}
@@ -292,7 +286,7 @@ func (l *Link) Parameters(name string) ([]string, map[string]string) {
 			params["o"] = "*" + params["o"]
 		}
 	}
-	if l.Rel == "instances" {
+	if l.Rel == "instances" && strings.ToUpper(l.Method) == "GET" {
 		order = append(order, "lr")
 		params["lr"] = "*ListRange"
 	}

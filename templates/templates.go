@@ -19,16 +19,9 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
   func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Name .}}) ({{values $Name $Def .}}) {
     {{if ($Def.EmptyResult .)}}
       return s.{{methodCap .Method}}(nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
-    {{else if ($Def.ReturnsCustomType .)}}
-      {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
-      return &{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
-    {{else if eq .Rel "instances"}}
-      {{$Var := printf "%s-%s" $Name "List" | initialLow}}
-      var {{$Var}} []*{{returnType $Name $Def .}}
-      return {{$Var}}, s.Get(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
-      return {{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
+      return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{end}}
   }
 {{end}}
