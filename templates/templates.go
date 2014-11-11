@@ -56,13 +56,13 @@ package {{.}}
 )
 
 var (
-	DefaultAPIURL = "{{.URL}}"
+	DefaultURL = "{{.URL}}"
 )
 
 // Service represents your API.
 type Service struct {
 	client *http.Client
-	APIURL string
+	URL string
 }
 
 // NewService creates a Service using the given, if none is provided
@@ -73,7 +73,7 @@ func NewService(c *http.Client) *Service {
 	}
 	return &Service{
 		client: c,
-		APIURL: DefaultAPIURL,
+		URL: DefaultURL,
 	}
 }
 
@@ -107,7 +107,7 @@ func (s *Service) NewRequest(method, path string, body interface{}, q interface{
 		rbody = bytes.NewReader(j)
 		ctype = "application/json"
 	}
-	req, err := http.NewRequest(method, s.APIURL+path, rbody)
+	req, err := http.NewRequest(method, s.URL+path, rbody)
 	if err != nil {
 		return nil, err
 	}
