@@ -62,10 +62,11 @@ type Schema struct {
 
 // Link represents a Link description.
 type Link struct {
-	Title       string  `json:"title,omitempty"`
-	Description string  `json:"description,omitempty"`
-	HRef        *HRef   `json:"href,omitempty"`
-	Rel         string  `json:"rel,omitempty"`
-	Method      string  `json:"method,omitempty"`
-	Schema      *Schema `json:"schema,omitempty"`
+	Title        string  `json:"title,omitempty"`
+	Description  string  `json:"description,omitempty"`
+	HRef         *HRef   `json:"href,omitempty"`
+	Rel          string  `json:"rel,omitempty"`
+	Method       string  `json:"method,omitempty"`
+	Schema       *Schema `json:"schema,omitempty"`
+	TargetSchema *Schema `json:"targetSchema,omitempty"`
 }
