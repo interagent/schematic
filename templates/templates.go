@@ -53,10 +53,7 @@ package {{.}}
 	"service.tmpl": `const (
 	Version          = "{{.Version}}"
 	DefaultUserAgent = "{{.Name}}/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
-)
-
-var (
-	DefaultURL = "{{.URL}}"
+	DefaultURL       = "{{.URL}}"
 )
 
 // Service represents your API.
