@@ -109,22 +109,16 @@ func (s *Service) NewRequest(method, path string, body interface{}, q interface{
 		return nil, err
 	}
 
-	qv := reflect.ValueOf(q)
-	for qv.Kind() == reflect.Ptr {
-		if qv.IsNil() {
-			break
-		}
-		qv = qv.Elem()
-	}
-	if qv.Kind() != reflect.Ptr && qv.IsValid() {
+	if q != nil {
 		v, err := query.Values(q)
 		if err != nil {
 			return nil, err
 		}
-		if req.URL.RawQuery != "" {
+		query := v.Encode()
+		if req.URL.RawQuery != "" && query != "" {
 			req.URL.RawQuery += "&"
 		}
-		req.URL.RawQuery += v.Encode()
+		req.URL.RawQuery += query
 	}
 
 	req.Header.Set("Accept", "application/json")
