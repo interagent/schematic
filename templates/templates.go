@@ -235,6 +235,7 @@ type {{initialCap .Name}} {{goType .Definition}}
 `,
 }
 
+// Parse parses declared templates.
 func Parse(t *template.Template) (*template.Template, error) {
 	for name, s := range templates {
 		var tmpl *template.Template
@@ -252,4 +253,3 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
-

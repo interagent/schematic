@@ -1,3 +1,4 @@
+//go:generate templates -s templates -o templates/templates.go
 package schematic
 
 import (

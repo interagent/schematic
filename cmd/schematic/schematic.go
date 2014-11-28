@@ -16,12 +16,16 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/interagent/schematic"
 )
+
+var output = flag.String("o", "", "Ouput file")
 
 func main() {
 	defer func() {
@@ -31,23 +35,35 @@ func main() {
 	}()
 
 	log.SetFlags(0)
+	log.SetPrefix("schematic: ")
 
-	if len(os.Args) != 2 {
-		log.Fatal("schematic: missing schema file")
+	flag.Parse()
+
+	if flag.NArg() != 1 {
+		log.Fatal("missing schema file")
 	}
 
-	var f *os.File
+	var i io.Reader
 	var err error
-	if os.Args[1] == "-" {
-		f = os.Stdin
+	if flag.Arg(0) == "-" {
+		i = os.Stdin
 	} else {
-		if f, err = os.Open(os.Args[1]); err != nil {
+		if i, err = os.Open(flag.Arg(0)); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	var o io.Writer
+	if *output == "" {
+		o = os.Stdout
+	} else {
+		if o, err = os.Create(*output); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	var s schematic.Schema
-	d := json.NewDecoder(f)
+	d := json.NewDecoder(i)
 	if err := d.Decode(&s); err != nil {
 		log.Fatal(err)
 	}
@@ -56,5 +72,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(code))
+
+	fmt.Fprintln(o, string(code))
 }
