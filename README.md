@@ -27,6 +27,12 @@ package heroku
 ...
 ```
 
+Or using ``go generate``:
+
+```
+//go:generate schematic -o heroku/heroku.go platform-api.json 
+```
+
 ## Client Usage
 
 You then would be able to use the package as follow:
