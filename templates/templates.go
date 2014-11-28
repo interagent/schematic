@@ -115,7 +115,6 @@ func (s *Service) NewRequest(method, path string, body interface{}, q interface{
 	qv := reflect.ValueOf(q)
 	for qv.Kind() == reflect.Ptr {
 		if qv.IsNil() {
-			fmt.Println("break")
 			break
 		}
 		qv = qv.Elem()
@@ -166,7 +165,7 @@ func (s *Service) Do(v interface{}, method, path string, body interface{}, q int
 
 // Get sends a GET request and decodes the response into v.
 func (s *Service) Get(v interface{}, path string, query interface{}, lr *ListRange) error {
-	return s.Do(v, "GET", path, nil, query, nil)
+	return s.Do(v, "GET", path, nil, query, lr)
 }
 
 // Patch sends a Path request and decodes the response into v.
