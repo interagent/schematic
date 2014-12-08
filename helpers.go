@@ -12,20 +12,21 @@ import (
 )
 
 var helpers = template.FuncMap{
-	"initialCap":       initialCap,
-	"initialLow":       initialLow,
-	"methodCap":        methodCap,
-	"asComment":        asComment,
-	"fieldTag":         fieldTag,
-	"params":           params,
-	"requestParams":    requestParams,
-	"args":             args,
-	"values":           values,
-	"goType":           goType,
-	"linkGoType":       linkGoType,
-	"returnType":       returnType,
-	"defineCustomType": defineCustomType,
-	"paramType":        paramType,
+	"initialCap":        initialCap,
+	"initialLow":        initialLow,
+	"methodCap":         methodCap,
+	"asComment":         asComment,
+	"fieldTag":          fieldTag,
+	"params":            params,
+	"requestParams":     requestParams,
+	"args":              args,
+	"values":            values,
+	"goType":            goType,
+	"linkGoType":        linkGoType,
+	"returnType":        returnType,
+	"defineCustomType":  defineCustomType,
+	"defineCustomArray": defineCustomArray,
+	"paramType":         paramType,
 }
 
 var (
@@ -190,6 +191,8 @@ func sortedKeys(m map[string]*Schema) (keys []string) {
 func returnType(name string, s *Schema, l *Link) string {
 	if defineCustomType(s, l) {
 		return initialCap(fmt.Sprintf("%s-%s-Result", name, l.Title))
+	} else if defineCustomArray(s, l) {
+		return initialCap(fmt.Sprintf("%s-%s-Result", name, l.Title))
 	}
 	return initialCap(name)
 }
@@ -203,4 +206,8 @@ func paramType(name string, l *Link) string {
 
 func defineCustomType(s *Schema, l *Link) bool {
 	return l.TargetSchema != nil && s.ReturnsCustomType(l)
+}
+
+func defineCustomArray(s *Schema, l *Link) bool {
+	return l.TargetSchema != nil && s.ReturnsArray(l)
 }

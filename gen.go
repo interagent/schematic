@@ -213,6 +213,8 @@ func (s *Schema) Values(name string, l *Link) []string {
 		values = append(values, "error")
 	} else if s.ReturnsCustomType(l) {
 		values = append(values, fmt.Sprintf("*%s", name), "error")
+	} else if s.ReturnsArray(l) {
+		values = append(values, fmt.Sprintf("[]%s", name), "error")
 	} else {
 		values = append(values, s.ReturnedGoType(l), "error")
 	}
@@ -235,6 +237,14 @@ func (s *Schema) ReturnsCustomType(l *Link) bool {
 		return len(l.TargetSchema.Properties) > 0
 	}
 	return len(s.Properties) > 0
+}
+
+// ReturnsArray returns true if the link returns an array.
+func (s *Schema) ReturnsArray(l *Link) bool {
+	if l.TargetSchema != nil {
+		return l.TargetSchema.Items != nil
+	}
+	return s.Items != nil
 }
 
 // ReturnedGoType returns Go type returned by the given link as a string.

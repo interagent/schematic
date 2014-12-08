@@ -13,6 +13,8 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 
   {{if (defineCustomType $Def .)}}
    type {{returnType $Name $Def .}} {{$Def.ReturnedGoType .}}
+  {{else if (defineCustomArray $Def .)}}
+   type {{returnType $Name $Def .}} {{.TargetSchema.Items.GoType}}
   {{end}}
 
   {{asComment .Description}}
@@ -20,7 +22,7 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
     {{if ($Def.EmptyResult .)}}
       return s.{{methodCap .Method}}(nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{else}}
-      {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
+      {{$Var := initialLow $Name}}var {{$Var}} {{if ($Def.ReturnsArray .)}}[]{{end}}{{returnType $Name $Def .}}
       return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{end}}
   }
@@ -239,11 +241,14 @@ func String(v string) *string {
 }
 `,
 	"struct.tmpl": `{{asComment .Definition.Description}}
+{{if (.Definition.Items)}}
+type {{initialCap .Name}} {{goType .Definition.Items}}
+{{else}}
 type {{initialCap .Name}} {{goType .Definition}}
+{{end}}
 `,
 }
 
-// Parse parses declared templates.
 func Parse(t *template.Template) (*template.Template, error) {
 	for name, s := range templates {
 		var tmpl *template.Template
@@ -261,3 +266,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+

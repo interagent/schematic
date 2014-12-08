@@ -7,6 +7,8 @@
 
   {{if (defineCustomType $Def .)}}
    type {{returnType $Name $Def .}} {{$Def.ReturnedGoType .}}
+  {{else if (defineCustomArray $Def .)}}
+   type {{returnType $Name $Def .}} {{.TargetSchema.Items.GoType}}
   {{end}}
 
   {{asComment .Description}}
@@ -14,7 +16,7 @@
     {{if ($Def.EmptyResult .)}}
       return s.{{methodCap .Method}}(nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{else}}
-      {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
+      {{$Var := initialLow $Name}}var {{$Var}} {{if ($Def.ReturnsArray .)}}[]{{end}}{{returnType $Name $Def .}}
       return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{end}}
   }

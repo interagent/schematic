@@ -508,6 +508,45 @@ var valuesTests = []struct {
 		},
 		Values: []string{"string", "error"},
 	},
+	{
+		Schema: &Schema{},
+		Name:   "Result",
+		Link: &Link{
+			Rel:   "result",
+			Title: "List",
+			TargetSchema: &Schema{
+				Type: "array",
+				Items: &Schema{
+					Properties: map[string]*Schema{
+						"value": {
+							Type: "integer",
+						},
+					},
+					Type: "object",
+				},
+			},
+		},
+		Values: []string{"[]ResultListResult", "error"},
+	},
+	{
+		Schema: &Schema{
+			Type: "array",
+			Items: &Schema{
+				Properties: map[string]*Schema{
+					"value": {
+						Type: "integer",
+					},
+				},
+				Type: "object",
+			},
+		},
+		Name: "Result",
+		Link: &Link{
+			Rel:   "result",
+			Title: "List",
+		},
+		Values: []string{"[]Result", "error"},
+	},
 }
 
 func TestValues(t *testing.T) {
