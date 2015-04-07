@@ -122,21 +122,31 @@ func asComment(c string) string {
 	removeNewlines := func(s string) string {
 		return strings.Replace(s, "\n", "\n// ", -1)
 	}
-	for len(c) > 0 {
-		line := c
+	findLastIndex := func(rs []rune, r rune) int {
+		l := -1
+		for i, v := range rs {
+			if v == r {
+				l = i
+			}
+		}
+		return l
+	}
+	r := []rune(c)
+	for len(r) > 0 {
+		line := r
 		if len(line) < maxLen {
-			fmt.Fprintf(&buf, "// %s\n", removeNewlines(line))
+			fmt.Fprintf(&buf, "// %s\n", removeNewlines(string(line)))
 			break
 		}
 		line = line[:maxLen]
-		si := strings.LastIndex(line, " ")
+		si := findLastIndex(line, []rune(" ")[0])
 		if si != -1 {
 			line = line[:si]
 		}
-		fmt.Fprintf(&buf, "// %s\n", removeNewlines(line))
-		c = c[len(line):]
+		fmt.Fprintf(&buf, "// %s\n", removeNewlines(string(line)))
+		r = r[len(line):]
 		if si != -1 {
-			c = c[1:]
+			r = r[1:]
 		}
 	}
 	return buf.String()
