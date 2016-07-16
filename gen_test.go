@@ -518,3 +518,23 @@ func TestValues(t *testing.T) {
 		}
 	}
 }
+
+func TestThatMissingNamesAreAllowed(t *testing.T) {
+	s := &Schema{
+		Properties: map[string]*Schema{
+			"name": &Schema{
+				Type: "string",
+			},
+		},
+	}
+	bytes, err := s.Generate()
+
+	code := string(bytes)
+	if !strings.Contains(code, "package main") {
+		t.Error("if the schema title is omitted, then the package should default to being called \"main\".")
+	}
+
+	if err != nil {
+		t.Fatal("if a schema title is omitted, the schema should still generate without failure, but the following error was found: " + err.Error())
+	}
+}
