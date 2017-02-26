@@ -18,13 +18,23 @@ func init() {
 	templates = template.Must(bundle.Parse(templates))
 }
 
+// ResolvedSet stores a set of pointers to objects that have already been
+// resolved to prevent infinite loops.
+type ResolvedSet map[interface{}]bool
+
+func (rs ResolvedSet) Insert(o interface{}) {
+	rs[o] = true
+}
+
+func (rs ResolvedSet) Has(o interface{}) bool {
+	return rs[o]
+}
+
 // Generate generates code according to the schema.
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
-	for i := 0; i < 2; i++ {
-		s.Resolve(nil)
-	}
+	s = s.Resolve(nil, ResolvedSet{})
 
 	name := strings.ToLower(strings.Split(s.Title, " ")[0])
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
@@ -78,33 +88,43 @@ func (s *Schema) Generate() ([]byte, error) {
 }
 
 // Resolve resolves reference inside the schema.
-func (s *Schema) Resolve(r *Schema) *Schema {
+func (s *Schema) Resolve(r *Schema, rs ResolvedSet) *Schema {
 	if r == nil {
 		r = s
 	}
+
+	for {
+		if s.Ref != nil {
+			s = s.Ref.Resolve(r)
+		} else if len(s.OneOf) > 0 {
+			s = s.OneOf[0].Ref.Resolve(r)
+		} else if len(s.AnyOf) > 0 {
+			s = s.AnyOf[0].Ref.Resolve(r)
+		} else {
+			break
+		}
+	}
+
+	if rs.Has(s) {
+		// Already resolved
+		return s
+	}
+	rs.Insert(s)
+
 	for n, d := range s.Definitions {
-		s.Definitions[n] = d.Resolve(r)
+		s.Definitions[n] = d.Resolve(r, rs)
 	}
 	for n, p := range s.Properties {
-		s.Properties[n] = p.Resolve(r)
+		s.Properties[n] = p.Resolve(r, rs)
 	}
 	for n, p := range s.PatternProperties {
-		s.PatternProperties[n] = p.Resolve(r)
+		s.PatternProperties[n] = p.Resolve(r, rs)
 	}
 	if s.Items != nil {
-		s.Items = s.Items.Resolve(r)
-	}
-	if s.Ref != nil {
-		s = s.Ref.Resolve(r)
-	}
-	if len(s.OneOf) > 0 {
-		s = s.OneOf[0].Ref.Resolve(r)
-	}
-	if len(s.AnyOf) > 0 {
-		s = s.AnyOf[0].Ref.Resolve(r)
+		s.Items = s.Items.Resolve(r, rs)
 	}
 	for _, l := range s.Links {
-		l.Resolve(r)
+		l.Resolve(r, rs)
 	}
 	return s
 }
@@ -303,14 +323,14 @@ func (l *Link) AcceptsCustomType() bool {
 }
 
 // Resolve resolve link schema and href.
-func (l *Link) Resolve(r *Schema) {
+func (l *Link) Resolve(r *Schema, rs ResolvedSet) {
 	if l.Schema != nil {
-		l.Schema = l.Schema.Resolve(r)
+		l.Schema = l.Schema.Resolve(r, rs)
 	}
 	if l.TargetSchema != nil {
-		l.TargetSchema = l.TargetSchema.Resolve(r)
+		l.TargetSchema = l.TargetSchema.Resolve(r, rs)
 	}
-	l.HRef.Resolve(r)
+	l.HRef.Resolve(r, rs)
 }
 
 // GoType returns Go type for the given schema as string and a bool specifying whether it is required
