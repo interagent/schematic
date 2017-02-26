@@ -18,6 +18,13 @@ var href = regexp.MustCompile(`({\([^\)]+)\)}`)
 // Reference represents a JSON Reference.
 type Reference string
 
+// NewReference creates a new Reference based on a reference value.
+func NewReference(ref string) *Reference {
+	r := new(Reference)
+	*r = Reference(ref)
+	return r
+}
+
 // Resolve resolves reference inside a Schema.
 func (rf Reference) Resolve(r *Schema) *Schema {
 	if !strings.HasPrefix(string(rf), fragment) {
@@ -95,7 +102,7 @@ func NewHRef(href string) *HRef {
 }
 
 // Resolve resolves a href inside a Schema.
-func (h *HRef) Resolve(r *Schema) {
+func (h *HRef) Resolve(r *Schema, rs resolvedSet) {
 	h.Order = make([]string, 0)
 	h.Schemas = make(map[string]*Schema)
 	for _, v := range href.FindAllString(string(h.href), -1) {
@@ -106,7 +113,7 @@ func (h *HRef) Resolve(r *Schema) {
 		parts := strings.Split(u, "/")
 		name := initialLow(fmt.Sprintf("%s-%s", parts[len(parts)-3], parts[len(parts)-1]))
 		h.Order = append(h.Order, name)
-		h.Schemas[name] = Reference(u).Resolve(r)
+		h.Schemas[name] = Reference(u).Resolve(r).Resolve(r, rs)
 	}
 }
 

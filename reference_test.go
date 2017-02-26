@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var resolveTests = []struct {
+var refResolveTests = []struct {
 	Ref      string
 	Schema   *Schema
 	Resolved *Schema
@@ -43,7 +43,7 @@ var resolveTests = []struct {
 }
 
 func TestReferenceResolve(t *testing.T) {
-	for i, rt := range resolveTests {
+	for i, rt := range refResolveTests {
 		ref := Reference(rt.Ref)
 		rsl := ref.Resolve(rt.Schema)
 		if !reflect.DeepEqual(rsl, rt.Resolved) {
@@ -113,7 +113,7 @@ var hrefTests = []struct {
 func TestHREfResolve(t *testing.T) {
 	for i, ht := range hrefTests {
 		href := NewHRef(ht.HRef)
-		href.Resolve(ht.Schema)
+		href.Resolve(ht.Schema, resolvedSet{})
 		if !reflect.DeepEqual(href.Order, ht.Order) {
 			t.Errorf("%d: resolved order don't match, got %v, wants %v", i, href.Order, ht.Order)
 		}

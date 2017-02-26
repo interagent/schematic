@@ -57,7 +57,7 @@ type Schema struct {
 	Not   *Schema  `json:"not,omitempty"`
 
 	// Links
-	Links []Link `json:"links,omitempty"`
+	Links []*Link `json:"links,omitempty"`
 }
 
 // Link represents a Link description.

@@ -1,10 +1,91 @@
 package schematic
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+var resolveTests = []struct {
+	Schema *Schema
+}{
+	{
+		Schema: &Schema{
+			Title: "Selfreferencing",
+			Type:  "object",
+			Definitions: map[string]*Schema{
+				"blog": {
+					Title: "Blog",
+					Type:  "object",
+					Links: []*Link{
+						{
+							Title:  "Create",
+							Rel:    "create",
+							HRef:   NewHRef("/blogs"),
+							Method: "POST",
+							Schema: &Schema{
+								Type: "object",
+								Properties: map[string]*Schema{
+									"name": {
+										Ref: NewReference("#/definitions/blog/definitions/name"),
+									},
+								},
+							},
+							TargetSchema: &Schema{
+								Ref: NewReference("#/definitions/blog"),
+							},
+						},
+						{
+							Title:  "Get",
+							Rel:    "self",
+							HRef:   NewHRef("/blogs/{(%23%2Fdefinitions%2Fblog%2Fdefinitions%2Fid)}"),
+							Method: "GET",
+							TargetSchema: &Schema{
+								Ref: NewReference("#/definitions/blog"),
+							},
+						},
+					},
+					Definitions: map[string]*Schema{
+						"id": {
+							Type: "string",
+						},
+						"name": {
+							Type: "string",
+						},
+					},
+					Properties: map[string]*Schema{
+						"id": {
+							Ref: NewReference("#/definitions/blog/definitions/id"),
+						},
+						"name": {
+							Ref: NewReference("#/definitions/blog/definitions/name"),
+						},
+					},
+				},
+			},
+			Properties: map[string]*Schema{
+				"blog": {
+					Ref: NewReference("#/definitions/blog"),
+				},
+			},
+		},
+	},
+}
+
+func TestResolve(t *testing.T) {
+	for i, rt := range resolveTests {
+		t.Run(fmt.Sprintf("resolveTests[%d]", i), func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Fatal(r)
+				}
+			}()
+
+			rt.Schema.Resolve(nil, resolvedSet{})
+		})
+	}
+}
 
 var typeTests = []struct {
 	Schema *Schema
@@ -226,7 +307,7 @@ var paramsTests = []struct {
 			HRef:  NewHRef("/update/"),
 			Schema: &Schema{
 				Properties: map[string]*Schema{
-					"id": &Schema{
+					"id": {
 						Type: "string",
 					},
 				},
@@ -244,7 +325,7 @@ var paramsTests = []struct {
 			HRef:  NewHRef("/update/"),
 			Schema: &Schema{
 				Properties: map[string]*Schema{
-					"id": &Schema{
+					"id": {
 						Type: "string",
 					},
 				},
@@ -290,7 +371,7 @@ var paramsTests = []struct {
 			HRef:  NewHRef("/results/{(%23%2Fdefinitions%2Fstruct%2Fdefinitions%2Fuuid)}"),
 			Schema: &Schema{
 				Properties: map[string]*Schema{
-					"id": &Schema{
+					"id": {
 						Type: "string",
 					},
 				},
@@ -304,7 +385,7 @@ var paramsTests = []struct {
 
 func TestParameters(t *testing.T) {
 	for i, pt := range paramsTests {
-		pt.Link.Resolve(pt.Schema)
+		pt.Link.Resolve(pt.Schema, resolvedSet{})
 		order, params := pt.Link.Parameters("link")
 		if !reflect.DeepEqual(order, pt.Order) {
 			t.Errorf("%d: wants %v, got %v", i, pt.Order, order)
