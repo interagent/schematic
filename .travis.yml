@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.2
-  - 1.3
-install: go get code.google.com/p/go.tools/cmd/cover
+  - 1.7
+  - 1.8
+install: go get golang.org/x/tools/cmd/cover
 script: go test -race -cover ./...
