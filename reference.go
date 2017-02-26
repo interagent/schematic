@@ -102,7 +102,7 @@ func NewHRef(href string) *HRef {
 }
 
 // Resolve resolves a href inside a Schema.
-func (h *HRef) Resolve(r *Schema, rs resolvedSet) {
+func (h *HRef) Resolve(r *Schema, rs ResolvedSet) {
 	h.Order = make([]string, 0)
 	h.Schemas = make(map[string]*Schema)
 	for _, v := range href.FindAllString(string(h.href), -1) {

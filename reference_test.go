@@ -113,7 +113,7 @@ var hrefTests = []struct {
 func TestHREfResolve(t *testing.T) {
 	for i, ht := range hrefTests {
 		href := NewHRef(ht.HRef)
-		href.Resolve(ht.Schema, resolvedSet{})
+		href.Resolve(ht.Schema, ResolvedSet{})
 		if !reflect.DeepEqual(href.Order, ht.Order) {
 			t.Errorf("%d: resolved order don't match, got %v, wants %v", i, href.Order, ht.Order)
 		}

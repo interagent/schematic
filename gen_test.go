@@ -82,7 +82,7 @@ func TestResolve(t *testing.T) {
 				}
 			}()
 
-			rt.Schema.Resolve(nil, resolvedSet{})
+			rt.Schema.Resolve(nil, ResolvedSet{})
 		})
 	}
 }
@@ -385,7 +385,7 @@ var paramsTests = []struct {
 
 func TestParameters(t *testing.T) {
 	for i, pt := range paramsTests {
-		pt.Link.Resolve(pt.Schema, resolvedSet{})
+		pt.Link.Resolve(pt.Schema, ResolvedSet{})
 		order, params := pt.Link.Parameters("link")
 		if !reflect.DeepEqual(order, pt.Order) {
 			t.Errorf("%d: wants %v, got %v", i, pt.Order, order)

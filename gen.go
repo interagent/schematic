@@ -18,15 +18,15 @@ func init() {
 	templates = template.Must(bundle.Parse(templates))
 }
 
-// resolvedSet stores a set of pointers to objects that have already been
+// ResolvedSet stores a set of pointers to objects that have already been
 // resolved to prevent infinite loops.
-type resolvedSet map[interface{}]bool
+type ResolvedSet map[interface{}]bool
 
-func (rs resolvedSet) Insert(o interface{}) {
+func (rs ResolvedSet) Insert(o interface{}) {
 	rs[o] = true
 }
 
-func (rs resolvedSet) Has(o interface{}) bool {
+func (rs ResolvedSet) Has(o interface{}) bool {
 	return rs[o]
 }
 
@@ -34,7 +34,7 @@ func (rs resolvedSet) Has(o interface{}) bool {
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
 
-	s = s.Resolve(nil, resolvedSet{})
+	s = s.Resolve(nil, ResolvedSet{})
 
 	name := strings.ToLower(strings.Split(s.Title, " ")[0])
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
@@ -88,7 +88,7 @@ func (s *Schema) Generate() ([]byte, error) {
 }
 
 // Resolve resolves reference inside the schema.
-func (s *Schema) Resolve(r *Schema, rs resolvedSet) *Schema {
+func (s *Schema) Resolve(r *Schema, rs ResolvedSet) *Schema {
 	if r == nil {
 		r = s
 	}
@@ -323,7 +323,7 @@ func (l *Link) AcceptsCustomType() bool {
 }
 
 // Resolve resolve link schema and href.
-func (l *Link) Resolve(r *Schema, rs resolvedSet) {
+func (l *Link) Resolve(r *Schema, rs ResolvedSet) {
 	if l.Schema != nil {
 		l.Schema = l.Schema.Resolve(r, rs)
 	}
