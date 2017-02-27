@@ -234,7 +234,7 @@ func (s *Schema) Values(name string, l *Link) []string {
 	} else if s.ReturnsCustomType(l) {
 		values = append(values, fmt.Sprintf("*%s", name), "error")
 	} else {
-		values = append(values, s.ReturnedGoType(l), "error")
+		values = append(values, name, "error")
 	}
 	return values
 }

@@ -456,7 +456,7 @@ var valuesTests = []struct {
 		Link: &Link{
 			Rel: "self",
 		},
-		Values: []string{"map[string]string", "error"},
+		Values: []string{"ConfigVar", "error"},
 	},
 	{
 		Schema: &Schema{},
@@ -501,6 +501,23 @@ var valuesTests = []struct {
 		Values: []string{"*ResultInfoResult", "error"},
 	},
 	{
+		Schema: &Schema{},
+		Name:   "ConfigVar",
+		Link: &Link{
+			Rel:   "self",
+			Title: "Info",
+			TargetSchema: &Schema{
+				Type: "object",
+				Properties: map[string]*Schema{
+					"value": {
+						Type: "integer",
+					},
+				},
+			},
+		},
+		Values: []string{"*ConfigVarInfoResult", "error"},
+	},
+	{
 		Schema: &Schema{
 			Type:                 "object",
 			AdditionalProperties: false,
@@ -535,7 +552,7 @@ var valuesTests = []struct {
 				Type: "string",
 			},
 		},
-		Values: []string{"string", "error"},
+		Values: []string{"ResultListResult", "error"},
 	},
 	{
 		Schema: &Schema{},
@@ -547,7 +564,7 @@ var valuesTests = []struct {
 				Type: []interface{}{"string", "null"},
 			},
 		},
-		Values: []string{"*string", "error"},
+		Values: []string{"ResultListResult", "error"},
 	},
 	{
 		Schema: &Schema{
@@ -567,7 +584,7 @@ var valuesTests = []struct {
 				Type: "string",
 			},
 		},
-		Values: []string{"string", "error"},
+		Values: []string{"ResultInfoResult", "error"},
 	},
 	{
 		Schema: &Schema{
@@ -587,7 +604,7 @@ var valuesTests = []struct {
 				Type: "string",
 			},
 		},
-		Values: []string{"string", "error"},
+		Values: []string{"ConfigVarInfoResult", "error"},
 	},
 }
 
