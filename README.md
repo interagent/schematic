@@ -30,7 +30,7 @@ package heroku
 Or using ``go generate``:
 
 ```
-//go:generate schematic -o heroku/heroku.go platform-api.json 
+//go:generate schematic -o heroku/heroku.go platform-api.json
 ```
 
 ## Client Usage
@@ -151,5 +151,5 @@ Schematic bundles templated Go code into a Go source file via the
 the Go source file after changing .tmpl files:
 
 ```console
-$ templates -source schema/templates/ > schema/templates/templates.go
+$ templates -s templates/ - templates/templates.go
 ```
