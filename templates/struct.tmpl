@@ -1,2 +1,6 @@
 {{asComment .Definition.Description}}
+{{if (.Definition.Items)}}
+type {{initialCap .Name}} {{goType .Definition.Items}}
+{{else}}
 type {{initialCap .Name}} {{goType .Definition}}
+{{end}}
