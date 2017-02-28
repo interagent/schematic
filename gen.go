@@ -234,9 +234,27 @@ func (s *Schema) Values(name string, l *Link) []string {
 	} else if s.ReturnsCustomType(l) {
 		values = append(values, fmt.Sprintf("*%s", name), "error")
 	} else {
-		values = append(values, s.ReturnedGoType(l), "error")
+		values = append(values, name, "error")
 	}
 	return values
+}
+
+// UniqueLinks returns a list of links, unique by title.
+//
+// If more than one link in a given schema has the same title, only the one
+// appearing last will appear in this list. This matches the behavior of the
+// heroics Ruby gem and avoids generating structs and funcs with duplicate
+// names.
+func (s *Schema) UniqueLinks() []*Link {
+	titles := map[string]bool{}
+	var uniqueLinks []*Link
+	for _, link := range s.Links {
+		if _, ok := titles[link.Title]; !ok {
+			uniqueLinks = append(uniqueLinks, link)
+		}
+		titles[link.Title] = true
+	}
+	return uniqueLinks
 }
 
 // URL returns schema base URL.
@@ -260,9 +278,9 @@ func (s *Schema) ReturnsCustomType(l *Link) bool {
 // ReturnedGoType returns Go type returned by the given link as a string.
 func (s *Schema) ReturnedGoType(l *Link) string {
 	if l.TargetSchema != nil {
-		return l.TargetSchema.goType(true, false)
+		return l.TargetSchema.goType(true, true)
 	}
-	return s.goType(true, false)
+	return s.goType(true, true)
 }
 
 // EmptyResult retursn true if the link result should be empty.

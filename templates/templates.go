@@ -6,7 +6,7 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 `,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Def := .Definition}}
-{{range .Definition.Links}}
+{{range .Definition.UniqueLinks}}
   {{if .AcceptsCustomType}}
    type {{paramType $Name .}} {{linkGoType .}}
   {{end}}
