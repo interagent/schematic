@@ -69,4 +69,6 @@ type Link struct {
 	Method       string  `json:"method,omitempty"`
 	Schema       *Schema `json:"schema,omitempty"`
 	TargetSchema *Schema `json:"targetSchema,omitempty"`
+	MediaType    string  `json:"mediaType,omitempty"`
+	EncType      string  `json:"encType,omitempty"`
 }
