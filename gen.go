@@ -37,15 +37,29 @@ func (s *Schema) Generate() ([]byte, error) {
 	s = s.Resolve(nil, ResolvedSet{})
 
 	name := strings.ToLower(strings.Split(s.Title, " ")[0])
-	templates.ExecuteTemplate(&buf, "package.tmpl", name)
+
+	if s.Title == "" {
+		name = "main"
+	}
+
+	err := templates.ExecuteTemplate(&buf, "package.tmpl", name)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute the package.tmpl with error " + err.Error())
+	}
 
 	// TODO: Check if we need time.
-	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
+	err = templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
 		"encoding/json", "fmt", "io", "reflect",
 		"net/http", "runtime", "time", "bytes",
 		"github.com/google/go-querystring/query",
 	})
-	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute the imports.tmpl with error %s", err.Error())
+	}
+
+	err = templates.ExecuteTemplate(&buf, "service.tmpl", struct {
 		Name    string
 		URL     string
 		Version string
@@ -55,8 +69,14 @@ func (s *Schema) Generate() ([]byte, error) {
 		Version: s.Version,
 	})
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute the service.tmpl with error %s", err.Error())
+	}
+
 	for _, name := range sortedKeys(s.Properties) {
+
 		schema := s.Properties[name]
+
 		// Skipping definitions because there is no links, nor properties.
 		if schema.Links == nil && schema.Properties == nil {
 			continue
@@ -70,8 +90,17 @@ func (s *Schema) Generate() ([]byte, error) {
 			Definition: schema,
 		}
 
-		templates.ExecuteTemplate(&buf, "struct.tmpl", context)
+		err = templates.ExecuteTemplate(&buf, "struct.tmpl", context)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute the struct.tmpl for property %s with error %s", name, err.Error())
+		}
+
 		templates.ExecuteTemplate(&buf, "funcs.tmpl", context)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute the funcs.tmpl for property %s with error %s", name, err.Error())
+		}
 	}
 
 	// Remove blank lines added by text/template
@@ -80,7 +109,7 @@ func (s *Schema) Generate() ([]byte, error) {
 	// Format sources
 	clean, err := format.Source(bytes)
 	if err != nil {
-		return buf.Bytes(), err
+		return buf.Bytes(), fmt.Errorf("failed to format the output source code with error %s", err.Error())
 	}
 	return clean, nil
 }
