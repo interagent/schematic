@@ -278,9 +278,9 @@ func (s *Schema) ReturnsCustomType(l *Link) bool {
 // ReturnedGoType returns Go type returned by the given link as a string.
 func (s *Schema) ReturnedGoType(l *Link) string {
 	if l.TargetSchema != nil {
-		return l.TargetSchema.goType(true, false)
+		return l.TargetSchema.goType(true, true)
 	}
-	return s.goType(true, false)
+	return s.goType(true, true)
 }
 
 // EmptyResult retursn true if the link result should be empty.
