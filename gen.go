@@ -43,9 +43,7 @@ func (s *Schema) Generate() ([]byte, error) {
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
 		"encoding/json", "fmt", "io", "reflect",
 		"net/http", "runtime", "time", "bytes",
-		// TODO: Change for google/go-querystring if pull request #5 gets merged
-		// https://github.com/google/go-querystring/pull/5
-		"github.com/ernesto-jimenez/go-querystring/query",
+		"github.com/google/go-querystring/query",
 	})
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
 		Name    string
