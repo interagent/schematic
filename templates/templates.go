@@ -16,12 +16,12 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
   {{end}}
 
   {{asComment .Description}}
-  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Name .}}) ({{values $Name $Def .}}) {
+  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}(ctx context.Context, {{params $Name .}}) ({{values $Name $Def .}}) {
     {{if ($Def.EmptyResult .)}}
-      return s.{{methodCap .Method}}(nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
+      return s.{{methodCap .Method}}(ctx, nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
-      return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
+      return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(ctx, &{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{end}}
   }
 {{end}}
@@ -75,7 +75,7 @@ func NewService(c *http.Client) *Service {
 }
 
 // NewRequest generates an HTTP request, but does not perform the request.
-func (s *Service) NewRequest(method, path string, body interface{}, q interface{}) (*http.Request, error) {
+func (s *Service) NewRequest(ctx context.Context, method, path string, body interface{}, q interface{}) (*http.Request, error) {
 	var ctype string
 	var rbody io.Reader
 
@@ -108,6 +108,7 @@ func (s *Service) NewRequest(method, path string, body interface{}, q interface{
 	if err != nil {
 		return nil, err
 	}
+	req = req.WithContext(ctx)
 
 	if q != nil {
 		v, err := query.Values(q)
@@ -131,8 +132,8 @@ func (s *Service) NewRequest(method, path string, body interface{}, q interface{
 }
 
 // Do sends a request and decodes the response into v.
-func (s *Service) Do(v interface{}, method, path string, body interface{}, q interface{}, lr *ListRange) error {
-	req, err := s.NewRequest(method, path, body, q)
+func (s *Service) Do(ctx context.Context, v interface{}, method, path string, body interface{}, q interface{}, lr *ListRange) error {
+	req, err := s.NewRequest(ctx, method, path, body, q)
 	if err != nil {
 		return err
 	}
@@ -155,28 +156,28 @@ func (s *Service) Do(v interface{}, method, path string, body interface{}, q int
 }
 
 // Get sends a GET request and decodes the response into v.
-func (s *Service) Get(v interface{}, path string, query interface{}, lr *ListRange) error {
-	return s.Do(v, "GET", path, nil, query, lr)
+func (s *Service) Get(ctx context.Context, v interface{}, path string, query interface{}, lr *ListRange) error {
+	return s.Do(ctx, v, "GET", path, nil, query, lr)
 }
 
 // Patch sends a Path request and decodes the response into v.
-func (s *Service) Patch(v interface{}, path string, body interface{}) error {
-	return s.Do(v, "PATCH", path, body, nil, nil)
+func (s *Service) Patch(ctx context.Context, v interface{}, path string, body interface{}) error {
+	return s.Do(ctx, v, "PATCH", path, body, nil, nil)
 }
 
 // Post sends a POST request and decodes the response into v.
-func (s *Service) Post(v interface{}, path string, body interface{}) error {
-	return s.Do(v, "POST", path, body, nil, nil)
+func (s *Service) Post(ctx context.Context, v interface{}, path string, body interface{}) error {
+	return s.Do(ctx, v, "POST", path, body, nil, nil)
 }
 
 // Put sends a PUT request and decodes the response into v.
-func (s *Service) Put(v interface{}, path string, body interface{}) error {
-	return s.Do(v, "PUT", path, body, nil, nil)
+func (s *Service) Put(ctx context.Context, v interface{}, path string, body interface{}) error {
+	return s.Do(ctx, v, "PUT", path, body, nil, nil)
 }
 
 // Delete sends a DELETE request.
-func (s *Service) Delete(v interface{}, path string) error {
-	return s.Do(v, "DELETE", path, nil, nil, nil)
+func (s *Service) Delete(ctx context.Context, v interface{}, path string) error {
+	return s.Do(ctx, v, "DELETE", path, nil, nil, nil)
 }
 
 // ListRange describes a range.

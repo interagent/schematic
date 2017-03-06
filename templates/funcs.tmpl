@@ -10,12 +10,12 @@
   {{end}}
 
   {{asComment .Description}}
-  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}({{params $Name .}}) ({{values $Name $Def .}}) {
+  func (s *Service) {{printf "%s-%s" $Name .Title | initialCap}}(ctx context.Context, {{params $Name .}}) ({{values $Name $Def .}}) {
     {{if ($Def.EmptyResult .)}}
-      return s.{{methodCap .Method}}(nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
+      return s.{{methodCap .Method}}(ctx, nil, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{else}}
       {{$Var := initialLow $Name}}var {{$Var}} {{returnType $Name $Def .}}
-      return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(&{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
+      return {{if ($Def.ReturnsCustomType .)}}&{{end}}{{$Var}}, s.{{methodCap .Method}}(ctx, &{{$Var}}, fmt.Sprintf("{{.HRef}}", {{args .HRef}}){{requestParams .}})
     {{end}}
   }
 {{end}}
