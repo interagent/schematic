@@ -10,7 +10,7 @@ Download and install:
 $ go get -u github.com/interagent/schematic/cmd/schematic
 ```
 
-**Warning**: schematic requires Go >= 1.2.
+**Warning**: schematic requires Go >= 1.7.
 
 ## Client Generation
 
