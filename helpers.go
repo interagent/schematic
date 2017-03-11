@@ -202,5 +202,5 @@ func paramType(name string, l *Link) string {
 }
 
 func defineCustomType(s *Schema, l *Link) bool {
-	return l.TargetSchema != nil
+	return l.TargetSchema != nil && l.TargetSchema != s
 }
