@@ -80,13 +80,13 @@ func (s *Service) NewRequest(ctx context.Context, method, path string, body inte
 }
 
 // Do sends a request and decodes the response into v.
-func (s *Service) Do(ctx context.Context, v interface{}, method, path string, body interface{}, q interface{}, lr *ListRange) error {
+func (s *Service) Do(ctx context.Context, v interface{}, method, path string, body interface{}, q interface{}, opts ...CallOption) error {
 	req, err := s.NewRequest(ctx, method, path, body, q)
 	if err != nil {
 		return err
 	}
-	if lr != nil {
-		lr.SetHeader(req)
+	for _, opt := range opts {
+		opt.Apply(req)
 	}
 	resp, err := s.client.Do(req)
 	if err != nil {
@@ -104,28 +104,33 @@ func (s *Service) Do(ctx context.Context, v interface{}, method, path string, bo
 }
 
 // Get sends a GET request and decodes the response into v.
-func (s *Service) Get(ctx context.Context, v interface{}, path string, query interface{}, lr *ListRange) error {
-	return s.Do(ctx, v, "GET", path, nil, query, lr)
+func (s *Service) Get(ctx context.Context, v interface{}, path string, query interface{}, opts ...CallOption) error {
+	return s.Do(ctx, v, "GET", path, nil, query, opts...)
 }
 
 // Patch sends a Path request and decodes the response into v.
-func (s *Service) Patch(ctx context.Context, v interface{}, path string, body interface{}) error {
-	return s.Do(ctx, v, "PATCH", path, body, nil, nil)
+func (s *Service) Patch(ctx context.Context, v interface{}, path string, body interface{}, opts ...CallOption) error {
+	return s.Do(ctx, v, "PATCH", path, body, nil, opts...)
 }
 
 // Post sends a POST request and decodes the response into v.
-func (s *Service) Post(ctx context.Context, v interface{}, path string, body interface{}) error {
-	return s.Do(ctx, v, "POST", path, body, nil, nil)
+func (s *Service) Post(ctx context.Context, v interface{}, path string, body interface{}, opts ...CallOption) error {
+	return s.Do(ctx, v, "POST", path, body, nil, opts...)
 }
 
 // Put sends a PUT request and decodes the response into v.
-func (s *Service) Put(ctx context.Context, v interface{}, path string, body interface{}) error {
-	return s.Do(ctx, v, "PUT", path, body, nil, nil)
+func (s *Service) Put(ctx context.Context, v interface{}, path string, body interface{}, opts ...CallOption) error {
+	return s.Do(ctx, v, "PUT", path, body, nil, opts...)
 }
 
 // Delete sends a DELETE request.
-func (s *Service) Delete(ctx context.Context, v interface{}, path string) error {
-	return s.Do(ctx, v, "DELETE", path, nil, nil, nil)
+func (s *Service) Delete(ctx context.Context, v interface{}, path string, opts ...CallOption) error {
+	return s.Do(ctx, v, "DELETE", path, nil, nil, opts...)
+}
+
+// CallOption configures an HTTP request before it is executed.
+type CallOption interface {
+	Apply(*http.Request)
 }
 
 // ListRange describes a range.
@@ -137,8 +142,10 @@ type ListRange struct {
 	LastID     string
 }
 
-// SetHeader set headers on the given Request.
-func (lr *ListRange) SetHeader(req *http.Request) {
+// Apply set headers on the given Request.
+//
+// Apply implements the CallOption interface.
+func (lr *ListRange) Apply(req *http.Request) {
 	var hdrval string
 	if lr.Field != "" {
 		hdrval += lr.Field + " "

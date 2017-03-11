@@ -323,10 +323,6 @@ func (l *Link) Parameters(name string) ([]string, map[string]string) {
 			params["o"] = "*" + params["o"]
 		}
 	}
-	if l.Rel == "instances" && strings.ToUpper(l.Method) == "GET" {
-		order = append(order, "lr")
-		params["lr"] = "*ListRange"
-	}
 	return order, params
 }
 

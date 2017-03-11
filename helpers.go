@@ -153,13 +153,14 @@ func params(name string, l *Link) string {
 	for _, n := range order {
 		p = append(p, fmt.Sprintf("%s %s", initialLow(n), params[n]))
 	}
+	p = append(p, "opts ...CallOption")
 	return strings.Join(p, ", ")
 }
 
 func requestParams(l *Link) string {
 	_, params := l.Parameters("")
 	if strings.ToUpper(l.Method) == "DELETE" {
-		return ""
+		return ", opts..."
 	}
 	p := []string{""}
 	if _, ok := params["o"]; ok {
@@ -167,11 +168,7 @@ func requestParams(l *Link) string {
 	} else {
 		p = append(p, "nil")
 	}
-	if _, ok := params["lr"]; ok {
-		p = append(p, "lr")
-	} else if strings.ToUpper(l.Method) == "GET" {
-		p = append(p, "nil")
-	}
+	p = append(p, "opts...")
 	return strings.Join(p, ", ")
 }
 
