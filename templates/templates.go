@@ -12,7 +12,7 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
   {{end}}
 
   {{if (defineCustomType $Def .)}}
-   type {{returnType $Name $Def .}} {{$Def.ReturnedGoType .}}
+   type {{returnType $Name $Def .}} {{$Def.ReturnedGoType $Name .}}
   {{end}}
 
   {{asComment .Description}}

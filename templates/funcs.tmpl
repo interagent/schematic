@@ -6,7 +6,7 @@
   {{end}}
 
   {{if (defineCustomType $Def .)}}
-   type {{returnType $Name $Def .}} {{$Def.ReturnedGoType .}}
+   type {{returnType $Name $Def .}} {{$Def.ReturnedGoType $Name .}}
   {{end}}
 
   {{asComment .Description}}

@@ -274,8 +274,11 @@ func (s *Schema) ReturnsCustomType(l *Link) bool {
 }
 
 // ReturnedGoType returns Go type returned by the given link as a string.
-func (s *Schema) ReturnedGoType(l *Link) string {
+func (s *Schema) ReturnedGoType(name string, l *Link) string {
 	if l.TargetSchema != nil {
+		if l.TargetSchema.Items == s {
+			return "[]" + initialCap(name)
+		}
 		return l.TargetSchema.goType(true, true)
 	}
 	return s.goType(true, true)
