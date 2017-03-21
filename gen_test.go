@@ -266,8 +266,7 @@ var paramsTests = []struct {
 			Rel:    "instances",
 			Method: "get",
 		},
-		Order:      []string{"lr"},
-		Parameters: map[string]string{"lr": "*ListRange"},
+		Parameters: map[string]string{},
 	},
 	{
 		Schema: &Schema{},
@@ -351,8 +350,8 @@ var paramsTests = []struct {
 				Type: "object",
 			},
 		},
-		Order:      []string{"o", "lr"},
-		Parameters: map[string]string{"o": "map[string]string", "lr": "*ListRange"},
+		Order:      []string{"o"},
+		Parameters: map[string]string{"o": "map[string]string"},
 	},
 	{
 		Schema: &Schema{
