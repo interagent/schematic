@@ -42,7 +42,7 @@ func (s *Schema) Generate() ([]byte, error) {
 	// TODO: Check if we need time.
 	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
 		"encoding/json", "fmt", "io", "reflect", "net/http", "runtime",
-		"time", "bytes", "context",
+		"time", "bytes", "context", "strings",
 		"github.com/google/go-querystring/query",
 	})
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
