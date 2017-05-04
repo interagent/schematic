@@ -6,7 +6,7 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
 `,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Def := .Definition}}
-{{range .Definition.UniqueLinks}}
+{{range .Definition.Links}}
   {{if .AcceptsCustomType}}
    type {{paramType $Name .}} {{linkGoType .}}
   {{end}}
@@ -263,4 +263,3 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
-
