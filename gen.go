@@ -71,7 +71,7 @@ func (s *Schema) Generate() ([]byte, error) {
 		}
 
 		if !s.CheckForDuplicateTitles() {
-			panic(fmt.Errorf("duplicate titles detected for %s", context.Name))
+			return nil, fmt.Errorf("duplicate titles detected for %s", context.Name)
 		}
 
 		templates.ExecuteTemplate(&buf, "struct.tmpl", context)
