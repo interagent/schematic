@@ -616,3 +616,63 @@ func TestValues(t *testing.T) {
 		}
 	}
 }
+
+var linkTitleTests = []struct {
+	Schema   *Schema
+	Expected bool
+}{
+	{
+		Schema: &Schema{
+			Title: "Selfreferencing",
+			Type:  "object",
+			Links: []*Link{
+				{
+					Title: "Create",
+				},
+				{
+					Title: "Create",
+				},
+			},
+		},
+		Expected: true,
+	},
+	{
+		Schema: &Schema{
+			Title: "Selfreferencing",
+			Type:  "object",
+			Links: []*Link{
+				{
+					Title: "update",
+				},
+				{
+					Title: "Update",
+				},
+			},
+		},
+		Expected: true,
+	},
+	{
+		Schema: &Schema{
+			Title: "Selfreferencing",
+			Type:  "object",
+			Links: []*Link{
+				{
+					Title: "Create",
+				},
+				{
+					Title: "Delete",
+				},
+			},
+		},
+		Expected: false,
+	},
+}
+
+func TestLinkTitles(t *testing.T) {
+	for i, lt := range linkTitleTests {
+		resp := lt.Schema.CheckForDuplicateTitles()
+		if resp != lt.Expected {
+			t.Errorf("%d: wants %v, got %v", i, lt.Expected, resp)
+		}
+	}
+}
