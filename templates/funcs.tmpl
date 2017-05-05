@@ -1,6 +1,6 @@
 {{$Name := .Name}}
 {{$Def := .Definition}}
-{{range .Definition.UniqueLinks}}
+{{range .Definition.Links}}
   {{if .AcceptsCustomType}}
    type {{paramType $Name .}} {{linkGoType .}}
   {{end}}
@@ -19,4 +19,3 @@
     {{end}}
   }
 {{end}}
-

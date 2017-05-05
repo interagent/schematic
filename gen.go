@@ -70,6 +70,10 @@ func (s *Schema) Generate() ([]byte, error) {
 			Definition: schema,
 		}
 
+		if !s.CheckForDuplicateTitles() {
+			return nil, fmt.Errorf("duplicate titles detected for %s", context.Name)
+		}
+
 		templates.ExecuteTemplate(&buf, "struct.tmpl", context)
 		templates.ExecuteTemplate(&buf, "funcs.tmpl", context)
 	}
@@ -237,22 +241,24 @@ func (s *Schema) Values(name string, l *Link) []string {
 	return values
 }
 
-// UniqueLinks returns a list of links, unique by title.
+// CheckForDuplicateTitles ensures that all titles are unique for a schema.
 //
-// If more than one link in a given schema has the same title, only the one
-// appearing last will appear in this list. This matches the behavior of the
-// heroics Ruby gem and avoids generating structs and funcs with duplicate
-// names.
-func (s *Schema) UniqueLinks() []*Link {
+// If more than one link in a given schema has the same title, we cannot
+// accurately generate the client from the schema. Although it's not strictly a
+// schema violation, it needs to be fixed before the client can be properly
+// generated.
+func (s *Schema) CheckForDuplicateTitles() bool {
 	titles := map[string]bool{}
 	var uniqueLinks []*Link
 	for _, link := range s.Links {
-		if _, ok := titles[link.Title]; !ok {
+		title := strings.ToLower(link.Title)
+		if _, ok := titles[title]; !ok {
 			uniqueLinks = append(uniqueLinks, link)
 		}
-		titles[link.Title] = true
+		titles[title] = true
 	}
-	return uniqueLinks
+
+	return len(uniqueLinks) != len(s.Links)
 }
 
 // URL returns schema base URL.
