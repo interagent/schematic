@@ -70,7 +70,7 @@ func (s *Schema) Generate() ([]byte, error) {
 			Definition: schema,
 		}
 
-		if !s.CheckForDuplicateTitles() {
+		if s.CheckForDuplicateTitles() {
 			return nil, fmt.Errorf("duplicate titles detected for %s", context.Name)
 		}
 
