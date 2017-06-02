@@ -634,7 +634,7 @@ var linkTitleTests = []struct {
 				},
 			},
 		},
-		Expected: true,
+		Expected: false,
 	},
 	{
 		Schema: &Schema{
@@ -649,7 +649,7 @@ var linkTitleTests = []struct {
 				},
 			},
 		},
-		Expected: true,
+		Expected: false,
 	},
 	{
 		Schema: &Schema{
@@ -664,13 +664,13 @@ var linkTitleTests = []struct {
 				},
 			},
 		},
-		Expected: false,
+		Expected: true,
 	},
 }
 
 func TestLinkTitles(t *testing.T) {
 	for i, lt := range linkTitleTests {
-		resp := lt.Schema.CheckForDuplicateTitles()
+		resp := lt.Schema.AreTitleLinksUnique()
 		if resp != lt.Expected {
 			t.Errorf("%d: wants %v, got %v", i, lt.Expected, resp)
 		}

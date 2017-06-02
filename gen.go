@@ -70,7 +70,7 @@ func (s *Schema) Generate() ([]byte, error) {
 			Definition: schema,
 		}
 
-		if !s.CheckForDuplicateTitles() {
+		if !s.AreTitleLinksUnique() {
 			return nil, fmt.Errorf("duplicate titles detected for %s", context.Name)
 		}
 
@@ -241,13 +241,13 @@ func (s *Schema) Values(name string, l *Link) []string {
 	return values
 }
 
-// CheckForDuplicateTitles ensures that all titles are unique for a schema.
+// AreTitleLinksUnique ensures that all titles are unique for a schema.
 //
 // If more than one link in a given schema has the same title, we cannot
 // accurately generate the client from the schema. Although it's not strictly a
 // schema violation, it needs to be fixed before the client can be properly
 // generated.
-func (s *Schema) CheckForDuplicateTitles() bool {
+func (s *Schema) AreTitleLinksUnique() bool {
 	titles := map[string]bool{}
 	var uniqueLinks []*Link
 	for _, link := range s.Links {
@@ -258,7 +258,7 @@ func (s *Schema) CheckForDuplicateTitles() bool {
 		titles[title] = true
 	}
 
-	return len(uniqueLinks) != len(s.Links)
+	return len(uniqueLinks) == len(s.Links)
 }
 
 // URL returns schema base URL.
