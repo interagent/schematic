@@ -222,7 +222,10 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 	}
 	// Types allow null
 	if contains("null", types) || !(required || force) {
-		return "*" + goType
+		// Don't need a pointer for these types to be "nilable"
+		if goType != "interface{}" && !strings.HasPrefix(goType, "[]") && !strings.HasPrefix(goType, "map[") {
+			return "*" + goType
+		}
 	}
 	return goType
 }
