@@ -192,6 +192,21 @@ var typeTests = []struct {
 		},
 		Type: "*time.Time",
 	},
+	{
+		Schema: &Schema{
+			Type: []interface{}{"null", "array"},
+			Items: &Schema{
+				Type: "string",
+			},
+		},
+		Type: "[]string",
+	},
+	{
+		Schema: &Schema{
+			Type: "any",
+		},
+		Type: "interface{}",
+	},
 }
 
 func TestSchemaType(t *testing.T) {
