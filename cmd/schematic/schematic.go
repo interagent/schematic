@@ -25,7 +25,7 @@ import (
 	"github.com/interagent/schematic"
 )
 
-var output = flag.String("o", "", "Ouput file")
+var output = flag.String("o", "", "Output file")
 
 func main() {
 	defer func() {

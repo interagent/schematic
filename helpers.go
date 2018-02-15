@@ -119,24 +119,21 @@ func capFirst(ident string) string {
 func asComment(c string) string {
 	var buf bytes.Buffer
 	const maxLen = 70
-	removeNewlines := func(s string) string {
-		return strings.Replace(s, "\n", "\n// ", -1)
-	}
 	r := []rune(c)
 	for len(r) > 0 {
 		line := r
 		if len(line) < maxLen {
-			fmt.Fprintf(&buf, "// %s\n", removeNewlines(string(line)))
+			fmt.Fprintf(&buf, "// %s\n", removeNewlines(line))
 			break
 		}
 		line = line[:maxLen]
-		si := strings.LastIndexFunc(string(line), func(r rune) bool {
+		si := lastIndex(line, func(r rune) bool {
 			return unicode.IsSpace(r)
 		})
 		if si != -1 {
 			line = line[:si]
 		}
-		fmt.Fprintf(&buf, "// %s\n", removeNewlines(string(line)))
+		fmt.Fprintf(&buf, "// %s\n", removeNewlines(line))
 		r = r[len(line):]
 		if si != -1 {
 			r = r[1:]
@@ -206,4 +203,17 @@ func paramType(name string, l *Link) string {
 
 func defineCustomType(s *Schema, l *Link) bool {
 	return l.TargetSchema != nil && l.TargetSchema != s
+}
+
+func removeNewlines(s []rune) string {
+	return strings.Replace(string(s), "\n", "\n// ", -1)
+}
+
+func lastIndex(s []rune, f func(rune) bool) int {
+	for i := len(s) - 1; i > 0; i-- {
+		if f(s[i]) {
+			return i
+		}
+	}
+	return -1
 }
