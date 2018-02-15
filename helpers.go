@@ -122,15 +122,6 @@ func asComment(c string) string {
 	removeNewlines := func(s string) string {
 		return strings.Replace(s, "\n", "\n// ", -1)
 	}
-	findLastIndex := func(rs []rune, r rune) int {
-		l := -1
-		for i, v := range rs {
-			if v == r {
-				l = i
-			}
-		}
-		return l
-	}
 	r := []rune(c)
 	for len(r) > 0 {
 		line := r
@@ -139,7 +130,9 @@ func asComment(c string) string {
 			break
 		}
 		line = line[:maxLen]
-		si := findLastIndex(line, []rune(" ")[0])
+		si := strings.LastIndexFunc(string(line), func(r rune) bool {
+			return unicode.IsSpace(r)
+		})
 		if si != -1 {
 			line = line[:si]
 		}
