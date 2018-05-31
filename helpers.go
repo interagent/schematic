@@ -30,7 +30,7 @@ var helpers = template.FuncMap{
 
 var (
 	newlines  = regexp.MustCompile(`(?m:\s*$)`)
-	acronyms  = regexp.MustCompile(`(Url|Http|Id|Io|Uuid|Api|Uri|Ssl|Cname|Oauth|Otp)$`)
+	acronyms  = regexp.MustCompile(`(Url|Http|Id|Io|Uuid|Api|Uri|Ssl|Cname|Oauth|Otp|Cidr)$`)
 	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}\s]+`)
 )
 
