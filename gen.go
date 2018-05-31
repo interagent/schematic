@@ -22,10 +22,12 @@ func init() {
 // resolved to prevent infinite loops.
 type ResolvedSet map[interface{}]bool
 
+// Insert marks a pointer as resolved.
 func (rs ResolvedSet) Insert(o interface{}) {
 	rs[o] = true
 }
 
+// Has returns if a pointer has already been resolved.
 func (rs ResolvedSet) Has(o interface{}) bool {
 	return rs[o]
 }
