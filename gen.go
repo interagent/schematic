@@ -3,8 +3,10 @@ package schematic
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"go/format"
+	"os"
 	"strings"
 	"text/template"
 
@@ -161,7 +163,7 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 	// Resolve JSON reference/pointer
 	types, err := s.Types()
 	if err != nil {
-		panic(err)
+		fail(s, err)
 	}
 	for _, kind := range types {
 		switch kind {
@@ -216,11 +218,11 @@ func (s *Schema) goType(required bool, force bool) (goType string) {
 		case "null":
 			continue
 		default:
-			panic(fmt.Sprintf("unknown type %s", kind))
+			fail(s, fmt.Errorf("unknown type %s", kind))
 		}
 	}
 	if goType == "" {
-		panic(fmt.Sprintf("type not found : %s", types))
+		fail(s, fmt.Errorf("type not found : %s", types))
 	}
 	// Types allow null
 	if contains("null", types) || !(required || force) {
@@ -370,4 +372,15 @@ func (l *Link) GoType() (string, bool) {
 		return t[1:], false
 	}
 	return t, true
+}
+
+func fail(v interface{}, err error) {
+	el, _ := json.MarshalIndent(v, "    ", "  ")
+
+	fmt.Printf(
+		"Error processing schema element:\n    %s\n\nFailed with: %s\n",
+		el,
+		err,
+	)
+	os.Exit(1)
 }
