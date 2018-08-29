@@ -377,7 +377,8 @@ func (l *Link) GoType() (string, bool) {
 func fail(v interface{}, err error) {
 	el, _ := json.MarshalIndent(v, "    ", "  ")
 
-	fmt.Printf(
+	fmt.Fprintf(
+		os.Stderr,
 		"Error processing schema element:\n    %s\n\nFailed with: %s\n",
 		el,
 		err,
