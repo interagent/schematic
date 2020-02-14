@@ -34,6 +34,20 @@ func (rs ResolvedSet) Has(o interface{}) bool {
 	return rs[o]
 }
 
+func (s *Schema) needsTime() bool {
+	if s.Type == "string" && s.goType(true, true) == "time.Time" {
+		return true
+	}
+
+	for _, propertySchema := range s.Properties {
+		if propertySchema.needsTime() {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Generate generates code according to the schema.
 func (s *Schema) Generate() ([]byte, error) {
 	var buf bytes.Buffer
@@ -42,13 +56,16 @@ func (s *Schema) Generate() ([]byte, error) {
 
 	name := strings.ToLower(strings.Split(s.Title, " ")[0])
 	templates.ExecuteTemplate(&buf, "package.tmpl", name)
-
-	// TODO: Check if we need time.
-	templates.ExecuteTemplate(&buf, "imports.tmpl", []string{
+	imports := []string{
 		"encoding/json", "fmt", "io", "reflect", "net/http", "runtime",
-		"time", "bytes", "context", "strings",
+		"bytes", "context", "strings",
 		"github.com/google/go-querystring/query",
-	})
+	}
+	if s.needsTime() {
+		imports = append(imports, "time")
+	}
+
+	templates.ExecuteTemplate(&buf, "imports.tmpl", imports)
 	templates.ExecuteTemplate(&buf, "service.tmpl", struct {
 		Name    string
 		URL     string
