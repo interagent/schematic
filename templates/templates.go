@@ -25,7 +25,6 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
     {{end}}
   }
 {{end}}
-
 `,
 	"imports.tmpl": `{{if .}}
   {{if len . | eq 1}}
@@ -37,7 +36,10 @@ var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} 
       {{end}}
     )
   {{end}}
-{{end}}`,
+{{end}}
+
+var _ = time.Second
+`,
 	"package.tmpl": `// Generated service client for {{.}} API.
 //
 // To be able to interact with this API, you have to
@@ -263,3 +265,4 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
+
