@@ -70,6 +70,7 @@ func main() {
 
 	code, err := s.Generate()
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", code)
 		log.Fatal(err)
 	}
 

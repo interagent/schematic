@@ -2,7 +2,7 @@ package templates
 
 import "text/template"
 
-var templates = map[string]string{"field.tmpl": `{{initialCap .Name}} {{.Type}} {{fieldTag .Name .Required}} {{asComment .Definition.Description}}
+var templates = map[string]string{"field.tmpl": `{{fieldName .Name}} {{.Type}} {{fieldTag .Name .Required}} {{asComment .Definition.Description}}
 `,
 	"funcs.tmpl": `{{$Name := .Name}}
 {{$Def := .Definition}}
@@ -265,4 +265,3 @@ func Parse(t *template.Template) (*template.Template, error) {
 	}
 	return t, nil
 }
-

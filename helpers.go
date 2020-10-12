@@ -16,6 +16,7 @@ var helpers = template.FuncMap{
 	"initialLow":       initialLow,
 	"methodCap":        methodCap,
 	"asComment":        asComment,
+	"fieldName":        fieldName,
 	"fieldTag":         fieldTag,
 	"params":           params,
 	"requestParams":    requestParams,
@@ -49,6 +50,16 @@ func required(n string, def *Schema) bool {
 
 func fieldTag(n string, required bool) string {
 	return fmt.Sprintf("`%s %s`", jsonTag(n, required), urlTag(n, required))
+}
+
+func fieldName(name string) string {
+	fieldName := initialCap(name)
+
+	if strings.HasSuffix(name, "?") {
+		fieldName = "Is" + strings.TrimSuffix(fieldName, "?")
+	}
+
+	return fieldName
 }
 
 func jsonTag(n string, required bool) string {
