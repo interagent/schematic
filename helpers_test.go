@@ -3,37 +3,60 @@ package schematic
 import "testing"
 
 var initialCapTests = []struct {
-	Ident     string
-	Depuncted string
+	In  string
+	Out string
 }{
 	{
-		Ident:     "provider_id",
-		Depuncted: "ProviderID",
+		In:  "provider_id",
+		Out: "ProviderID",
 	},
 	{
-		Ident:     "app-identity",
-		Depuncted: "AppIdentity",
+		In:  "app-identity",
+		Out: "AppIdentity",
 	},
 	{
-		Ident:     "uuid",
-		Depuncted: "UUID",
+		In:  "uuid",
+		Out: "UUID",
 	},
 	{
-		Ident:     "oauth-client",
-		Depuncted: "OAuthClient",
+		In:  "oauth-client",
+		Out: "OAuthClient",
 	},
 	{
-		Ident:     "Dyno all",
-		Depuncted: "DynoAll",
+		In:  "Dyno all",
+		Out: "DynoAll",
 	},
 }
 
 func TestInitialCap(t *testing.T) {
 	for i, ict := range initialCapTests {
-		depuncted := depunct(ict.Ident, true)
-		if depuncted != ict.Depuncted {
-			t.Errorf("%d: wants %v, got %v", i, ict.Depuncted, depuncted)
+		depuncted := depunct(ict.In, true)
+		if depuncted != ict.Out {
+			t.Errorf("%d: wants %v, got %v", i, ict.Out, depuncted)
 		}
+	}
+}
+
+var fieldNameTests = append([]struct {
+	In  string
+	Out string
+}{
+	{
+		In:  "ca_signed?",
+		Out: "IsCaSigned",
+	},
+},
+	initialCapTests...,
+)
+
+func TestFieldName(t *testing.T) {
+	for _, tt := range fieldNameTests {
+		t.Run(tt.In, func(t *testing.T) {
+			got := fieldName(tt.In)
+			if got != tt.Out {
+				t.Fatalf("got %q want %q", got, tt.Out)
+			}
+		})
 	}
 }
 
