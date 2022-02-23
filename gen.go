@@ -75,7 +75,7 @@ func (s *Schema) Generate() ([]byte, error) {
 		}
 
 		if !context.Definition.AreTitleLinksUnique() {
-			return nil, fmt.Errorf("duplicate titles detected for %s", context.Name)
+			return nil, fmt.Errorf("Duplicate %s.links.title detected in the schema. Links must have distinct titles.", context.Name)
 		}
 
 		templates.ExecuteTemplate(&buf, "struct.tmpl", context)
