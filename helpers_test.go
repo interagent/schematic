@@ -26,6 +26,22 @@ var initialCapTests = []struct {
 		In:  "Dyno all",
 		Out: "DynoAll",
 	},
+	{
+		In:  "Info (Consecutive)",
+		Out: "InfoConsecutive",
+	},
+	{
+		In:  "Get (Special)",
+		Out: "GetSpecial",
+	},
+	{
+		In:  "List (All Items)",
+		Out: "ListAllItems",
+	},
+	{
+		In:  "Update(Force)",
+		Out: "UpdateForce",
+	},
 }
 
 func TestInitialCap(t *testing.T) {

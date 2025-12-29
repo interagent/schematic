@@ -102,9 +102,9 @@ func (s *Schema) Resolve(r *Schema, rs ResolvedSet) *Schema {
 	for {
 		if s.Ref != nil {
 			s = s.Ref.Resolve(r)
-		} else if len(s.OneOf) > 0 {
+		} else if len(s.OneOf) > 0 && s.OneOf[0].Ref != nil {
 			s = s.OneOf[0].Ref.Resolve(r)
-		} else if len(s.AnyOf) > 0 {
+		} else if len(s.AnyOf) > 0 && s.AnyOf[0].Ref != nil {
 			s = s.AnyOf[0].Ref.Resolve(r)
 		} else {
 			break
