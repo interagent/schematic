@@ -65,13 +65,13 @@ func main() {
 	var s schematic.Schema
 	d := json.NewDecoder(i)
 	if err := d.Decode(&s); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("Error decoding schema JSON: %w", err))
 	}
 
 	code, err := s.Generate()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", code)
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("Error generating Go code (output above): %w", err))
 	}
 
 	fmt.Fprintln(o, string(code))
