@@ -32,7 +32,7 @@ var helpers = template.FuncMap{
 var (
 	newlines  = regexp.MustCompile(`(?m:\s*$)`)
 	acronyms  = regexp.MustCompile(`(Url|Http|Id|Io|Ip|Ike|Uuid|Api|Uri|Ssl|Cname|Oauth|Otp|Cidr|Nat|Vpn)$`)
-	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}\s]+`)
+	camelcase = regexp.MustCompile(`(?m)[-.$/:_{}()\s]+`)
 )
 
 func goType(p *Schema) string {
@@ -108,18 +108,23 @@ func initialLow(ident string) string {
 
 func depunct(ident string, initialCap bool) string {
 	matches := camelcase.Split(ident, -1)
+	var result []string
 	for i, m := range matches {
+		if m == "" {
+			continue
+		}
 		if initialCap || i > 0 {
 			m = capFirst(m)
 		}
-		matches[i] = acronyms.ReplaceAllStringFunc(m, func(c string) string {
+		var replaced = acronyms.ReplaceAllStringFunc(m, func(c string) string {
 			if len(c) > 4 {
 				return strings.ToUpper(c[:2]) + c[2:]
 			}
 			return strings.ToUpper(c)
 		})
+		result = append(result, replaced)
 	}
-	return strings.Join(matches, "")
+	return strings.Join(result, "")
 }
 
 func capFirst(ident string) string {

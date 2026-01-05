@@ -81,6 +81,81 @@ var generateTests = []struct {
 			},
 		},
 	},
+	{
+		ExpectedServiceFunctions: []string{"ResourceCreate", "ResourceInfoSpecial"},
+		Schema: &Schema{
+			Title: "Bug Reproducer API",
+			Properties: map[string]*Schema{
+				"resource": {
+					Ref: NewReference("#/definitions/resource"),
+				},
+			},
+			Definitions: map[string]*Schema{
+				"resource": {
+					Title: "Resource",
+					Type:  "object",
+					Definitions: map[string]*Schema{
+						"id": {
+							Type: "string",
+						},
+						"name": {
+							Type: "string",
+						},
+					},
+					Links: []*Link{
+						{
+							Title:  "Create",
+							Rel:    "create",
+							HRef:   NewHRef("/resources"),
+							Method: "POST",
+							Schema: &Schema{
+								Type: "object",
+								Properties: map[string]*Schema{
+									"name": {
+										Ref: NewReference("#/definitions/resource/definitions/name"),
+									},
+								},
+								AnyOf: []Schema{
+									{
+										Required: []string{"name"},
+									},
+									{
+										Required: []string{"option"},
+									},
+								},
+							},
+							TargetSchema: &Schema{
+								Ref: NewReference("#/definitions/resource"),
+							},
+						},
+						{
+							Title:  "Info (Special)",
+							Rel:    "self",
+							HRef:   NewHRef("/resources/{(%23%2Fdefinitions%2Fresource%2Fdefinitions%2Fid)}"),
+							Method: "GET",
+							TargetSchema: &Schema{
+								Ref: NewReference("#/definitions/resource"),
+							},
+						},
+					},
+					Properties: map[string]*Schema{
+						"id": {
+							Ref: NewReference("#/definitions/resource/definitions/id"),
+						},
+						"name": {
+							Ref: NewReference("#/definitions/resource/definitions/name"),
+						},
+					},
+				},
+			},
+			Links: []*Link{
+				{
+					Rel:  "self",
+					HRef: NewHRef("https://api.example.com"),
+				},
+			},
+		},
+	},
 }
 
 func TestGenerate(t *testing.T) {
@@ -190,6 +265,97 @@ var resolveTests = []struct {
 			Properties: map[string]*Schema{
 				"blog": {
 					Ref: NewReference("#/definitions/blog"),
+				},
+			},
+		},
+	},
+	{
+		Schema: &Schema{
+			Title: "AnyOfWithoutRef",
+			Type:  "object",
+			Definitions: map[string]*Schema{
+				"resource": {
+					Title: "Resource",
+					Type:  "object",
+					Links: []*Link{
+						{
+							Title:  "Create",
+							Rel:    "create",
+							HRef:   NewHRef("/resources"),
+							Method: "POST",
+							Schema: &Schema{
+								Type: "object",
+								Properties: map[string]*Schema{
+									"name": {
+										Type: "string",
+									},
+								},
+								AnyOf: []Schema{
+									{
+										Required: []string{"name"},
+									},
+									{
+										Required: []string{"option"},
+									},
+								},
+							},
+						},
+					},
+					Definitions: map[string]*Schema{
+						"id": {
+							Type: "string",
+						},
+					},
+					Properties: map[string]*Schema{
+						"id": {
+							Ref: NewReference("#/definitions/resource/definitions/id"),
+						},
+					},
+				},
+			},
+			Properties: map[string]*Schema{
+				"resource": {
+					Ref: NewReference("#/definitions/resource"),
+				},
+			},
+		},
+	},
+	{
+		Schema: &Schema{
+			Title: "OneOfWithoutRef",
+			Type:  "object",
+			Definitions: map[string]*Schema{
+				"resource": {
+					Title: "Resource",
+					Type:  "object",
+					Links: []*Link{
+						{
+							Title:  "Update",
+							Rel:    "update",
+							HRef:   NewHRef("/resources"),
+							Method: "PATCH",
+							Schema: &Schema{
+								Type: "object",
+								OneOf: []Schema{
+									{
+										Properties: map[string]*Schema{
+											"name": {Type: "string"},
+										},
+									},
+									{
+										Properties: map[string]*Schema{
+											"value": {Type: "integer"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Properties: map[string]*Schema{
+				"resource": {
+					Ref: NewReference("#/definitions/resource"),
 				},
 			},
 		},
